@@ -58,4 +58,6 @@ struct NetworkSpyTest {
         return NetworkSpy(sessionConfiguration: sessionConfiguration,
                           responseProvider: responseProvider)
     }
+
+    // TODO: Remove spy binding header from request before it is provided to the responseProvider
 }

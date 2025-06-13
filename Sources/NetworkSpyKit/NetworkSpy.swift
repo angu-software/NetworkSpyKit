@@ -20,12 +20,21 @@ public final class NetworkSpy: Sendable {
     let id: String = UUID().uuidString
     let responseProvider: ResponseProvider
 
-    private let spyRegistry: SpyRegistry = SpyRegistry.shared
+    private let spyRegistry: SpyRegistry
 
-    public init(sessionConfiguration: URLSessionConfiguration,
-                responseProvider: @escaping ResponseProvider) {
+    public convenience init(sessionConfiguration: URLSessionConfiguration,
+                            responseProvider: @escaping ResponseProvider) {
+        self.init(sessionConfiguration: sessionConfiguration,
+                  responseProvider: responseProvider,
+                  spyRegistry: .shared)
+    }
+
+    init(sessionConfiguration: URLSessionConfiguration,
+                responseProvider: @escaping ResponseProvider,
+                spyRegistry: SpyRegistry) {
         self.sessionConfiguration = Self.copyConfiguration(sessionConfiguration)
         self.responseProvider = responseProvider
+        self.spyRegistry = spyRegistry
 
         setUp()
     }

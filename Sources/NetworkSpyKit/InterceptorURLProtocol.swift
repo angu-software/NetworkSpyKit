@@ -9,6 +9,8 @@ import Foundation
 
 final class InterceptorURLProtocol: URLProtocol {
 
+    private let spyRegistry =  SpyRegistry.shared
+
     // MARK: - URLProtocol
 
     override class func canInit(with request: URLRequest) -> Bool {

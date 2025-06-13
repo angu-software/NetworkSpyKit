@@ -9,8 +9,6 @@ import Foundation
 
 public final class NetworkSpy {
 
-    public typealias Request = URLRequest
-
     public typealias ResponseProvider = (Request) -> Response
 
     /// The `URLSessionConfiguration` associated with this spy.

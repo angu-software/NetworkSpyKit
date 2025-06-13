@@ -15,7 +15,7 @@ extension NetworkSpy {
         var data: Data?
 
         public init(statusCode: Int,
-                    headers: [String: String],
+                    headers: [String: String] = [:],
                     data: Data? = nil) {
             self.statusCode = statusCode
             self.headers = headers

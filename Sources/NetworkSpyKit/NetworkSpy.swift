@@ -21,12 +21,24 @@ public final class NetworkSpy {
 
     static let headerKey = "X-NetworkSpy-ID"
     let id: String = UUID().uuidString
-
+    
     public init(sessionConfiguration: URLSessionConfiguration,
                 responseProvder: @escaping ResponseProvider) {
-        self.sessionConfiguration = sessionConfiguration.copy() as! URLSessionConfiguration
+        self.sessionConfiguration = Self.copyConfiguration(sessionConfiguration)
         self.responseProvder = responseProvder
 
+        setUp()
+    }
+
+    private static func copyConfiguration(_ configuration: URLSessionConfiguration) -> URLSessionConfiguration {
+        return configuration.copy() as! URLSessionConfiguration
+    }
+
+    private func setUp() {
+        bindConfigurationToSpy()
+    }
+
+    private func bindConfigurationToSpy() {
         var sessionHeaders = self.sessionConfiguration.httpAdditionalHeaders ?? [:]
         sessionHeaders[Self.headerKey] = self.id
         self.sessionConfiguration.httpAdditionalHeaders = sessionHeaders

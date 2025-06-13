@@ -1,15 +1,15 @@
 import Testing
 
-@testable import NetworkSpyKit
+import NetworkSpyKit
 
 struct NetworkSpyTests {
 
     private typealias Response = NetworkSpy.Response
 
-    @Test // TODO: tags acceptanceTest
+    @Test
     func should_return_stubbed_response() async throws {
         await withKnownIssue("ACC: In development") {
-            let spy = NetworkSpy() { _ in
+            let spy = NetworkSpy(sessionConfiguration: .default) { _ in
                 return Response(statusCode: 200,
                                 headers: ["Content-Type": "text/plain"],
                                 data: "Hello spy!".data(using: .utf8))

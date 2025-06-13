@@ -7,7 +7,7 @@
 
 import Foundation
 
-@testable import NetworkSpyKit
+import NetworkSpyKit
 
 final class NetworkClient {
 

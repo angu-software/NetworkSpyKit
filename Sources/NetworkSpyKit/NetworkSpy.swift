@@ -7,17 +7,17 @@
 
 import Foundation
 
-final class NetworkSpy {
+public final class NetworkSpy {
 
-    typealias Request = URLRequest
+    public typealias Request = URLRequest
 
-    typealias ResponseProvder = (Request) -> Response
+    public typealias ResponseProvder = (Request) -> Response
 
-    let sessionConfiguration: URLSessionConfiguration
-    var responseProvder: ResponseProvder
-
-    init(sessionConfiguration: URLSessionConfiguration = .default,
-         responseProvder: @escaping ResponseProvder) {
+    public let sessionConfiguration: URLSessionConfiguration
+    public var responseProvder: ResponseProvder
+    
+    public init(sessionConfiguration: URLSessionConfiguration,
+                responseProvder: @escaping ResponseProvder) {
         self.sessionConfiguration = sessionConfiguration
         self.responseProvder = responseProvder
     }

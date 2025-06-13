@@ -39,4 +39,15 @@ struct NetworkSpyTest {
 
         #expect(spy.sessionConfiguration.protocolClasses?.map { "\($0)" } == ["InterceptorURLProtocol"])
     }
+
+    @Test
+    func should_register_on_SpyRegistry() async throws {
+        let spy = NetworkSpy(sessionConfiguration: .default) { _ in
+            return .init(statusCode: 200, headers: [:])
+        }
+
+        #expect(SpyRegistry.shared.spy(byId: spy.id) === spy)
+    }
+
+    // unregister when deallocated
 }

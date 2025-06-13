@@ -7,7 +7,8 @@
 
 import Foundation
 
-public final class NetworkSpy {
+// TODO: Make setable response provider thread safe
+public final class NetworkSpy: @unchecked Sendable {
 
     public typealias ResponseProvider = (Request) -> Response
 
@@ -19,7 +20,9 @@ public final class NetworkSpy {
 
     static let headerKey = "X-NetworkSpy-ID"
     let id: String = UUID().uuidString
-    
+
+    private let spyRegistry: SpyRegistry = SpyRegistry.shared
+
     public init(sessionConfiguration: URLSessionConfiguration,
                 responseProvder: @escaping ResponseProvider) {
         self.sessionConfiguration = Self.copyConfiguration(sessionConfiguration)
@@ -33,8 +36,13 @@ public final class NetworkSpy {
     }
 
     private func setUp() {
+        registerOnRegistry()
         bindConfigurationToSpy()
         installInterceptorOnConfiguration()
+    }
+
+    private func registerOnRegistry() {
+        spyRegistry.register(self)
     }
 
     private func bindConfigurationToSpy() {

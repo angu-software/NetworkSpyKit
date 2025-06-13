@@ -12,9 +12,7 @@ import Testing
 
 struct NetworkSpyTest {
 
-    private static let defaultResponseProvider: NetworkSpy.ResponseProvider = { _ in
-        return .init(statusCode: 200, headers: [:])
-    }
+    private static let defaultResponseProvider: NetworkSpy.ResponseProvider = { _ in return .teaPot }
 
     @Test // FIXME: better name for test
     func should_set_spy_id_on_session_config() async throws {

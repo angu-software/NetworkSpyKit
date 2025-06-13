@@ -11,17 +11,20 @@ public final class NetworkSpy {
 
     public typealias Request = URLRequest
 
-    public typealias ResponseProvder = (Request) -> Response
+    public typealias ResponseProvider = (Request) -> Response
 
+    /// The `URLSessionConfiguration` associated with this spy.
+    ///
+    /// A copy of the injected `URLSessionConfiguration` instance during initialization
     public let sessionConfiguration: URLSessionConfiguration
-    public var responseProvder: ResponseProvder
+    public var responseProvder: ResponseProvider
 
     static let headerKey = "X-NetworkSpy-ID"
     let id: String = UUID().uuidString
 
     public init(sessionConfiguration: URLSessionConfiguration,
-                responseProvder: @escaping ResponseProvder) {
-        self.sessionConfiguration = sessionConfiguration
+                responseProvder: @escaping ResponseProvider) {
+        self.sessionConfiguration = sessionConfiguration.copy() as! URLSessionConfiguration
         self.responseProvder = responseProvder
 
         var sessionHeaders = self.sessionConfiguration.httpAdditionalHeaders ?? [:]

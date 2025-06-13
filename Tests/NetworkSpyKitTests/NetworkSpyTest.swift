@@ -5,6 +5,7 @@
 //  Created by Andreas Günther on 13.06.25.
 //
 
+import Foundation
 import Testing
 
 @testable import NetworkSpyKit
@@ -20,5 +21,13 @@ struct NetworkSpyTest {
         #expect(spy.sessionConfiguration.httpAdditionalHeaders?[NetworkSpy.headerKey] as? String == spy.id)
     }
 
-    // copy session
+    @Test
+    func should_provide_copy_of_injected_sessionConfiguration() async throws {
+        let injectedConfig = URLSessionConfiguration.default
+        let spy = NetworkSpy(sessionConfiguration: injectedConfig) { _ in
+            return .init(statusCode: 200, headers: [:])
+        }
+
+        #expect(spy.sessionConfiguration !== injectedConfig)
+    }
 }

@@ -15,12 +15,24 @@ struct SpyRegistryTest {
     @Test
     func should_return_spy_for_URLRequest() async throws {
         let registry = SpyRegistry()
-        let spy = NetworkSpy(sessionConfiguration: .ephemeral,
-                             responseProvider: { _ in .teaPot },
-                             spyRegistry: registry)
-        var request = URLRequest(url: URL(string: "https://example.com")!)
-        request.allHTTPHeaderFields = [NetworkSpy.headerKey: spy.id]
+        let spy = makeSpy(spyRegistry: registry)
+        let request = makeRequest(spyId: spy.id)
 
         #expect(registry.spy(for: request) === spy)
+    }
+
+    // MARK: Testing API
+
+    private func makeRequest(spyId: String) -> URLRequest {
+        var request = URLRequest(url: URL(string: "https://example.com")!)
+        request.allHTTPHeaderFields = [NetworkSpy.headerKey: spyId]
+
+        return request
+    }
+
+    private func makeSpy(spyRegistry: SpyRegistry) -> NetworkSpy {
+        return NetworkSpy(sessionConfiguration: .ephemeral,
+                             responseProvider: { _ in .teaPot },
+                             spyRegistry: spyRegistry)
     }
 }

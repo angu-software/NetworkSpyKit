@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "C4518BF0-682F-4174-9896-594C032F6B63",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "language" : "en",
+    "region" : "US"
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "NetworkSpyKitTests",
+        "name" : "NetworkSpyKitTests"
+      }
+    }
+  ],
+  "version" : 1
+}

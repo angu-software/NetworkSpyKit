@@ -8,7 +8,7 @@
 import Foundation
 
 /// A Simplified representation of an URLRequest
-public struct Request: Equatable {
+public struct Request: Equatable, Sendable {
 
     public let httpMethod: String
     public let url: URL

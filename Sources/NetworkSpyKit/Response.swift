@@ -9,7 +9,7 @@ import Foundation
 
 extension NetworkSpy {
 
-    public struct Response: Equatable {
+    public struct Response: Equatable, Sendable {
         var statusCode: Int
         var headers: [String: String]
         var data: Data?

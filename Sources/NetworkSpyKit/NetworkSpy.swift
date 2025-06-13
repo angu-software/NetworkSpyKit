@@ -10,7 +10,7 @@ import Foundation
 // TODO: Make setable response provider thread safe
 public final class NetworkSpy: @unchecked Sendable {
 
-    public typealias ResponseProvider = (Request) -> Response
+    public typealias ResponseProvider = @Sendable (Request) -> Response
 
     /// The `URLSessionConfiguration` associated with this spy.
     ///
@@ -31,6 +31,10 @@ public final class NetworkSpy: @unchecked Sendable {
         setUp()
     }
 
+    deinit {
+        unregisterFromRegistry()
+    }
+
     private static func copyConfiguration(_ configuration: URLSessionConfiguration) -> URLSessionConfiguration {
         return configuration.copy() as! URLSessionConfiguration
     }
@@ -43,6 +47,10 @@ public final class NetworkSpy: @unchecked Sendable {
 
     private func registerOnRegistry() {
         spyRegistry.register(self)
+    }
+
+    private func unregisterFromRegistry() {
+        spyRegistry.unregister(byId: id)
     }
 
     private func bindConfigurationToSpy() {

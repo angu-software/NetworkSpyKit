@@ -12,6 +12,10 @@ import Testing
 
 struct NetworkSpyTest {
 
+    private static let defaultResponseProvider: NetworkSpy.ResponseProvider = { _ in
+        return .init(statusCode: 200, headers: [:])
+    }
+
     @Test // FIXME: better name for test
     func should_set_spy_id_on_session_config() async throws {
         let spy = NetworkSpy(sessionConfiguration: .ephemeral) { _ in
@@ -49,5 +53,19 @@ struct NetworkSpyTest {
         #expect(SpyRegistry.shared.spy(byId: spy.id) === spy)
     }
 
-    // unregister when deallocated
+    @Test
+    func should_unregister_on_SpyRegistry_when_deallocated() async throws {
+        var spy: NetworkSpy? = makeSpy()
+        let spyId = try #require(spy?.id)
+
+        spy = nil
+
+        #expect(SpyRegistry.shared.spy(byId: spyId) == nil)
+    }
+
+    private func makeSpy(sessionConfiguration: URLSessionConfiguration = .default,
+                         _ responseProvider: @escaping NetworkSpy.ResponseProvider = defaultResponseProvider) -> NetworkSpy {
+        return NetworkSpy(sessionConfiguration: sessionConfiguration,
+                          responseProvder: responseProvider)
+    }
 }

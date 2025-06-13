@@ -14,11 +14,9 @@ struct NetworkSpyTest {
 
     private static let defaultResponseProvider: NetworkSpy.ResponseProvider = { _ in return .teaPot }
 
-    @Test // FIXME: better name for test
-    func should_set_spy_id_on_session_config() async throws {
-        let spy = NetworkSpy(sessionConfiguration: .ephemeral) { _ in
-            return .init(statusCode: 200, headers: [:])
-        }
+    @Test
+    func should_bind_spy_to_sessionConfiguration() async throws {
+        let spy = makeSpy()
 
         #expect(spy.sessionConfiguration.httpAdditionalHeaders?[NetworkSpy.headerKey] as? String == spy.id)
     }
@@ -26,27 +24,21 @@ struct NetworkSpyTest {
     @Test
     func should_provide_copy_of_injected_sessionConfiguration() async throws {
         let injectedConfig = URLSessionConfiguration.default
-        let spy = NetworkSpy(sessionConfiguration: injectedConfig) { _ in
-            return .init(statusCode: 200, headers: [:])
-        }
+        let spy = makeSpy(sessionConfiguration: injectedConfig)
 
         #expect(spy.sessionConfiguration !== injectedConfig)
     }
 
     @Test
     func should_install_InterceptorURLProtocol_on_sessionConfiguration() async throws {
-        let spy = NetworkSpy(sessionConfiguration: .ephemeral) { _ in
-            return .init(statusCode: 200, headers: [:])
-        }
+        let spy = makeSpy()
 
         #expect(spy.sessionConfiguration.protocolClasses?.map { "\($0)" } == ["InterceptorURLProtocol"])
     }
 
     @Test
     func should_register_on_SpyRegistry() async throws {
-        let spy = NetworkSpy(sessionConfiguration: .default) { _ in
-            return .init(statusCode: 200, headers: [:])
-        }
+        let spy = makeSpy()
 
         #expect(SpyRegistry.shared.spy(byId: spy.id) === spy)
     }

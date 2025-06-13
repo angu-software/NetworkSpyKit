@@ -52,4 +52,15 @@ struct RequestMappingTest {
 
         #expect(request.bodyData == bodyData)
     }
+
+    @Test
+    func should_map_httpBodyStream_of_URLRequest() async throws {
+        let bodyData = "Hello".data(using: .utf8)!
+        var urlRequest = URLRequest(url: URL(string: "https://example.com?foo=bar&baz=qux")!)
+        urlRequest.httpBodyStream = InputStream(data: bodyData)
+
+        let request = try #require(Request(urlRequest: urlRequest))
+
+        #expect(request.bodyData == bodyData)
+    }
 }

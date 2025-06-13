@@ -7,8 +7,7 @@
 
 import Foundation
 
-// TODO: Make setable response provider thread safe
-public final class NetworkSpy: @unchecked Sendable {
+public final class NetworkSpy: Sendable {
 
     public typealias ResponseProvider = @Sendable (Request) -> Response
 
@@ -16,17 +15,17 @@ public final class NetworkSpy: @unchecked Sendable {
     ///
     /// A copy of the injected `URLSessionConfiguration` instance during initialization
     public let sessionConfiguration: URLSessionConfiguration
-    public var responseProvder: ResponseProvider
 
     static let headerKey = "X-NetworkSpy-ID"
     let id: String = UUID().uuidString
+    let responseProvider: ResponseProvider
 
     private let spyRegistry: SpyRegistry = SpyRegistry.shared
 
     public init(sessionConfiguration: URLSessionConfiguration,
-                responseProvder: @escaping ResponseProvider) {
+                responseProvider: @escaping ResponseProvider) {
         self.sessionConfiguration = Self.copyConfiguration(sessionConfiguration)
-        self.responseProvder = responseProvder
+        self.responseProvider = responseProvider
 
         setUp()
     }

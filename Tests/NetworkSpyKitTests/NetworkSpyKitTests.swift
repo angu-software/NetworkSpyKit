@@ -24,4 +24,6 @@ struct NetworkSpyKitTests {
                                                  data: "Hello spy!".data(using: .utf8)))
         }
     }
+
+    // can change provider after initialization
 }

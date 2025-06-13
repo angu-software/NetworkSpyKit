@@ -66,6 +66,6 @@ struct NetworkSpyTest {
     private func makeSpy(sessionConfiguration: URLSessionConfiguration = .default,
                          _ responseProvider: @escaping NetworkSpy.ResponseProvider = defaultResponseProvider) -> NetworkSpy {
         return NetworkSpy(sessionConfiguration: sessionConfiguration,
-                          responseProvder: responseProvider)
+                          responseProvider: responseProvider)
     }
 }

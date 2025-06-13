@@ -30,4 +30,13 @@ struct NetworkSpyTest {
 
         #expect(spy.sessionConfiguration !== injectedConfig)
     }
+
+    @Test
+    func should_install_InterceptorURLProtocol_on_sessionConfiguration() async throws {
+        let spy = NetworkSpy(sessionConfiguration: .ephemeral) { _ in
+            return .init(statusCode: 200, headers: [:])
+        }
+
+        #expect(spy.sessionConfiguration.protocolClasses?.map { "\($0)" } == ["InterceptorURLProtocol"])
+    }
 }

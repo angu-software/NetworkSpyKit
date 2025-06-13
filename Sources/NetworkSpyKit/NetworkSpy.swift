@@ -36,11 +36,16 @@ public final class NetworkSpy {
 
     private func setUp() {
         bindConfigurationToSpy()
+        installInterceptorOnConfiguration()
     }
 
     private func bindConfigurationToSpy() {
-        var sessionHeaders = self.sessionConfiguration.httpAdditionalHeaders ?? [:]
-        sessionHeaders[Self.headerKey] = self.id
-        self.sessionConfiguration.httpAdditionalHeaders = sessionHeaders
+        var sessionHeaders = sessionConfiguration.httpAdditionalHeaders ?? [:]
+        sessionHeaders[Self.headerKey] = id
+        sessionConfiguration.httpAdditionalHeaders = sessionHeaders
+    }
+
+    private func installInterceptorOnConfiguration() {
+        sessionConfiguration.protocolClasses = [InterceptorURLProtocol.self]
     }
 }

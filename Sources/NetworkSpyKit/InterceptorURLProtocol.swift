@@ -20,7 +20,8 @@ final class InterceptorURLProtocol: URLProtocol {
     }
 
     override func startLoading() {
-
+        client?.urlProtocol(self, didFailWithError: NSError(domain: "", code: 0, userInfo: nil))
+        client?.urlProtocolDidFinishLoading(self)
     }
 
     override func stopLoading() {

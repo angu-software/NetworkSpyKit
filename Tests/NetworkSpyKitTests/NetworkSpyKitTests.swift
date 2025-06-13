@@ -2,7 +2,7 @@ import Testing
 
 import NetworkSpyKit
 
-struct NetworkSpyTests {
+struct NetworkSpyKitTests {
 
     private typealias Response = NetworkSpy.Response
 

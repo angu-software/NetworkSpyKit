@@ -41,4 +41,15 @@ struct RequestMappingTest {
 
         #expect(request.headers == ["Content-Type": "application/json"])
     }
+
+    @Test
+    func should_map_httpBody_of_URLRequest() async throws {
+        let bodyData = "Hello".data(using: .utf8)!
+        var urlRequest = URLRequest(url: URL(string: "https://example.com?foo=bar&baz=qux")!)
+        urlRequest.httpBody = bodyData
+
+        let request = try #require(Request(urlRequest: urlRequest))
+
+        #expect(request.bodyData == bodyData)
+    }
 }

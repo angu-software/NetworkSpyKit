@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Request.swift
 //  NetworkSpyKit
 //
 //  Created by Andreas Günther on 13.06.25.
@@ -13,15 +13,15 @@ public struct Request: Equatable {
     public let httpMethod: String
     public let url: URL
     public let headers: [String: String]
-    public let data: Data?
+    public let bodyData: Data?
 
     public init(httpMethod: String,
                 url: URL,
                 headers: [String: String],
-                data: Data?) {
+                bodyData: Data?) {
         self.httpMethod = httpMethod
         self.url = url
         self.headers = headers
-        self.data = data
+        self.bodyData = bodyData
     }
 }

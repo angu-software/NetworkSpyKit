@@ -18,6 +18,6 @@ extension Request {
         self.init(httpMethod: httpMethod,
                   url: url,
                   headers: urlRequest.allHTTPHeaderFields ?? [:],
-                  data: nil)
+                  bodyData: urlRequest.httpBody)
     }
 }

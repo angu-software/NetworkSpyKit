@@ -16,7 +16,7 @@ struct SpyRegistryTest {
     func should_return_spy_for_URLRequest() async throws {
         let registry = SpyRegistry()
         let spy = makeSpy(spyRegistry: registry)
-        let request = makeRequest(spyId: spy.id)
+        let request: URLRequest = .fixture(spyId: spy.id)
 
         #expect(registry.spy(for: request) === spy)
     }

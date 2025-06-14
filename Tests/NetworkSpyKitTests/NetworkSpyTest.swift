@@ -14,6 +14,12 @@ struct NetworkSpyTest {
 
     private static let defaultResponseProvider: NetworkSpy.ResponseProvider = { _ in return .teaPot }
 
+    private let spyRegistry: SpyRegistry
+
+    init() {
+        self.spyRegistry = SpyRegistry()
+    }
+
     @Test
     func should_bind_spy_to_sessionConfiguration() async throws {
         let spy = makeSpy()
@@ -40,7 +46,7 @@ struct NetworkSpyTest {
     func should_register_on_SpyRegistry() async throws {
         let spy = makeSpy()
 
-        #expect(SpyRegistry.shared.spy(byId: spy.id) === spy)
+        #expect(spyRegistry.spy(byId: spy.id) === spy)
     }
 
     @Test
@@ -50,13 +56,14 @@ struct NetworkSpyTest {
 
         spy = nil
 
-        #expect(SpyRegistry.shared.spy(byId: spyId) == nil)
+        #expect(spyRegistry.spy(byId: spyId) == nil)
     }
 
     private func makeSpy(sessionConfiguration: URLSessionConfiguration = .default,
                          _ responseProvider: @escaping NetworkSpy.ResponseProvider = defaultResponseProvider) -> NetworkSpy {
         return NetworkSpy(sessionConfiguration: sessionConfiguration,
-                          responseProvider: responseProvider)
+                          responseProvider: responseProvider,
+                          spyRegistry: spyRegistry)
     }
 
     // TODO: Remove spy binding header from request before it is provided to the responseProvider

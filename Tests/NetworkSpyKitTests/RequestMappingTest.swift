@@ -15,7 +15,7 @@ struct RequestMappingTest {
 
     @Test
     func should_map_url_of_URLRequest() async throws {
-        let urlRequest = URLRequest(url: URL(string: "https://example.com?foo=bar&baz=qux")!)
+        let urlRequest = URLRequest.fixture(url: URL(string: "https://example.com?foo=bar&baz=qux")!)
 
         let request = try #require(Request(urlRequest: urlRequest))
 
@@ -24,8 +24,8 @@ struct RequestMappingTest {
 
     @Test
     func should_map_httpMethod_of_URLRequest() async throws {
-        var urlRequest = URLRequest(url: URL(string: "https://example.com?foo=bar&baz=qux")!)
-        urlRequest.httpMethod = "POST"
+        let urlRequest = URLRequest.fixture(url: URL(string: "https://example.com?foo=bar&baz=qux")!,
+                                            httpMethod: "POST")
 
         let request = try #require(Request(urlRequest: urlRequest))
 
@@ -34,8 +34,8 @@ struct RequestMappingTest {
 
     @Test
     func should_map_headers_of_URLRequest() async throws {
-        var urlRequest = URLRequest(url: URL(string: "https://example.com?foo=bar&baz=qux")!)
-        urlRequest.allHTTPHeaderFields = ["Content-Type": "application/json"]
+        let urlRequest = URLRequest.fixture(url: URL(string: "https://example.com?foo=bar&baz=qux")!,
+                                            httpHeaderFields: ["Content-Type": "application/json"])
 
         let request = try #require(Request(urlRequest: urlRequest))
 
@@ -45,8 +45,8 @@ struct RequestMappingTest {
     @Test
     func should_map_httpBody_of_URLRequest() async throws {
         let bodyData = "Hello".data(using: .utf8)!
-        var urlRequest = URLRequest(url: URL(string: "https://example.com?foo=bar&baz=qux")!)
-        urlRequest.httpBody = bodyData
+        let urlRequest = URLRequest.fixture(url: URL(string: "https://example.com?foo=bar&baz=qux")!,
+                                            httpBody: bodyData)
 
         let request = try #require(Request(urlRequest: urlRequest))
 
@@ -56,8 +56,8 @@ struct RequestMappingTest {
     @Test
     func should_map_httpBodyStream_of_URLRequest() async throws {
         let bodyData = "Hello".data(using: .utf8)!
-        var urlRequest = URLRequest(url: URL(string: "https://example.com?foo=bar&baz=qux")!)
-        urlRequest.httpBodyStream = InputStream(data: bodyData)
+        let urlRequest = URLRequest.fixture(url: URL(string: "https://example.com?foo=bar&baz=qux")!,
+                                            httpBodyStream: InputStream(data: bodyData))
 
         let request = try #require(Request(urlRequest: urlRequest))
 

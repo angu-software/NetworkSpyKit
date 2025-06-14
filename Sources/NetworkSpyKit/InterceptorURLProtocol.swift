@@ -28,7 +28,7 @@ final class InterceptorURLProtocol: URLProtocol {
                                                               statusCode: 418,
                                                               httpVersion: nil,
                                                               headerFields: nil)!,
-                            cacheStoragePolicy: .allowedInMemoryOnly)
+                            cacheStoragePolicy: .notAllowed)
         client?.urlProtocol(self, didFailWithError: NSError(domain: "", code: 0, userInfo: nil))
         client?.urlProtocolDidFinishLoading(self)
     }

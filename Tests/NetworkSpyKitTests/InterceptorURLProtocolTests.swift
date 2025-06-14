@@ -54,9 +54,20 @@ struct InterceptorURLProtocolTests {
         #expect((clientSpy.didReceiveResponse as? HTTPURLResponse)?.statusCode == 418)
     }
 
-    // TODO: did receive response data for spy response
+    @Test
+    func should_not_cache_responses() async throws {
+        let spy = NetworkSpy(sessionConfiguration: .default,
+                             responseProvider: { _ in .teaPot },
+                             spyRegistry: spyRegistry)
+
+        let interceptor = makeInterceptor(request: .fixture(spyId: spy.id))
+
+        interceptor.startLoading()
+
+        #expect(clientSpy.didReceiveResponseCachePolicy == .notAllowed)
+    }
+
     // TODO: error when spy not found
-    // TODO: Cache policy
 
     private func makeInterceptor(request: URLRequest) -> InterceptorURLProtocol {
         return InterceptorURLProtocol(request: .fixture(spyId: nil),

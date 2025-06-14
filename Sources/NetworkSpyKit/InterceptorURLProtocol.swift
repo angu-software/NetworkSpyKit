@@ -11,6 +11,7 @@ final class InterceptorURLProtocol: URLProtocol {
 
     enum Error: Swift.Error {
         case spyNotFoundForRequest
+        case couldNotCreateRequestForSpy
     }
 
     var spyRegistry: SpyRegistry = .shared
@@ -59,7 +60,7 @@ extension NetworkSpy {
 
     func response(for urlRequest: URLRequest) throws -> HTTPURLResponse {
         guard let request = Request(urlRequest: urlRequest) else {
-            throw Error.spyNotFoundForRequest // TODO: correct error
+            throw Error.couldNotCreateRequestForSpy
         }
 
         let response = try response(for: request)
@@ -70,7 +71,7 @@ extension NetworkSpy {
                                headerFields: nil)!
     }
 
-    func response(for request: Request) throws -> Response {
+    private func response(for request: Request) throws -> Response {
         return try responseProvider(request)
     }
 }

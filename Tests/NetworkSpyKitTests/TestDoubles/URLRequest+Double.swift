@@ -12,7 +12,7 @@ import Foundation
 extension URLRequest {
 
     static func fixture(url: URL = URL(string: "https://example.com")!,
-                        httpMethod: String? = "GET",
+                        httpMethod: String = "GET",
                         httpHeaderFields: [String: String] = [:],
                         httpBody: Data? = nil,
                         httpBodyStream: InputStream? = nil,

@@ -10,12 +10,11 @@ import Foundation
 extension Request {
 
     init?(urlRequest: URLRequest) {
-        guard let url = urlRequest.url,
-              let httpMethod = urlRequest.httpMethod else {
+        guard let url = urlRequest.url else {
             return nil
         }
 
-        self.init(httpMethod: httpMethod,
+        self.init(httpMethod: urlRequest.httpMethod ?? "GET",
                   url: url,
                   headers: urlRequest.allHTTPHeaderFields ?? [:],
                   bodyData: urlRequest.resolvedHTTPBody())

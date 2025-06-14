@@ -71,6 +71,18 @@ struct InterceptorURLProtocolTests {
     }
 
     @Test
+    func should_load_with_error_when_request_could_not_be_build_for_spy() async throws {
+        let spy = spyBuilder.build()
+        interceptorBuilder.request = .fixture(spyId: spy.id)
+        interceptorBuilder.request.url = nil
+        let interceptor = interceptorBuilder.build()
+
+        interceptor.startLoading()
+
+        #expect(clientSpy.didFailLoadingWithError as? InterceptorError == .couldNotCreateRequestForSpy)
+    }
+
+    @Test
     func should_tell_client_when_loading_has_finished_after_error() async throws {
         let interceptor = interceptorBuilder.build()
 

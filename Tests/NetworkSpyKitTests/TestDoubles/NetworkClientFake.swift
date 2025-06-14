@@ -1,5 +1,5 @@
 //
-//  TestingNetworkClient.swift
+//  NetworkClientFake.swift
 //  NetworkSpyKit
 //
 //  Created by Andreas Günther on 13.06.25.
@@ -9,7 +9,7 @@ import Foundation
 
 import NetworkSpyKit
 
-final class TestingNetworkClient {
+final class NetworkClientFake {
 
     private let session: URLSession
 

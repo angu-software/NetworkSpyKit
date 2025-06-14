@@ -15,7 +15,7 @@ struct NetworkSpyKitTests {
                                 data: "Hello spy!".data(using: .utf8))
             }
 
-            let networkClient = TestingNetworkClient(sessionConfiguration: spy.sessionConfiguration)
+            let networkClient = NetworkClientFake(sessionConfiguration: spy.sessionConfiguration)
 
             let receivedResponse = try await networkClient.sendRequest()
 

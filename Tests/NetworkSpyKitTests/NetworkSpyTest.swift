@@ -29,8 +29,7 @@ struct NetworkSpyTest {
 
     @Test
     func should_provide_copy_of_injected_sessionConfiguration() async throws {
-        let injectedConfig = URLSessionConfiguration.default
-        spyBuilder.sessionConfiguration = injectedConfig
+        let injectedConfig = spyBuilder.sessionConfiguration
         let spy = spyBuilder.build()
 
         #expect(spy.sessionConfiguration !== injectedConfig)

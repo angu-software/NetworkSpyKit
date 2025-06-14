@@ -13,20 +13,23 @@ import Testing
 struct InterceptorURLProtocolTests {
 
     private let clientSpy: ProtocolClientSpy
+    private let interceptorBuilder: InterceptorBuilder
     private let spyRegistry: SpyRegistry
     private let spyBuilder: SpyBuilder
 
     init() {
         self.clientSpy = ProtocolClientSpy()
+        self.interceptorBuilder = InterceptorBuilder(client: clientSpy)
         self.spyRegistry = SpyRegistry()
         self.spyBuilder = SpyBuilder(spyRegistry: spyRegistry)
+
 
         //InterceptorURLProtocol.setSpyRegistry(spyRegistry)
     }
 
     @Test // TODO: More specific error cases (request with no spy, spy not found, response stub throws, http response could not be build)
     func should_tell_client_when_loading_failed() async throws {
-        let interceptor = makeInterceptor(request: .fixture(spyId: nil))
+        let interceptor = interceptorBuilder.build()
 
         interceptor.startLoading()
 
@@ -36,7 +39,7 @@ struct InterceptorURLProtocolTests {
 
     @Test
     func should_tell_client_when_loading_has_finished_after_error() async throws {
-        let interceptor = makeInterceptor(request: .fixture(spyId: nil))
+        let interceptor = interceptorBuilder.build()
 
         interceptor.startLoading()
 
@@ -47,7 +50,8 @@ struct InterceptorURLProtocolTests {
     func should_receive_response_for_spy_request() async throws {
         let spy = spyBuilder.build()
 
-        let interceptor = makeInterceptor(request: .fixture(spyId: spy.id))
+        interceptorBuilder.request = .fixture(spyId: spy.id)
+        let interceptor = interceptorBuilder.build()
 
         interceptor.startLoading()
 
@@ -56,11 +60,10 @@ struct InterceptorURLProtocolTests {
 
     @Test
     func should_not_cache_responses() async throws {
-        let spy = NetworkSpy(sessionConfiguration: .default,
-                             responseProvider: { _ in .teaPot },
-                             spyRegistry: spyRegistry)
+        let spy = spyBuilder.build()
 
-        let interceptor = makeInterceptor(request: .fixture(spyId: spy.id))
+        interceptorBuilder.request = .fixture(spyId: spy.id)
+        let interceptor = interceptorBuilder.build()
 
         interceptor.startLoading()
 
@@ -68,10 +71,4 @@ struct InterceptorURLProtocolTests {
     }
 
     // TODO: error when spy not found
-
-    private func makeInterceptor(request: URLRequest) -> InterceptorURLProtocol {
-        return InterceptorURLProtocol(request: .fixture(spyId: nil),
-                                      cachedResponse: nil,
-                                      client: clientSpy)
-    }
 }

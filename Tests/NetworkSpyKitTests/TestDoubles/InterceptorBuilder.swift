@@ -14,16 +14,23 @@ final class InterceptorBuilder {
     let client: any URLProtocolClient
 
     var request: URLRequest
+    var spyRegistry: SpyRegistry
 
     init(request: URLRequest = .fixture(spyId: nil),
-         client: any URLProtocolClient) {
+         client: any URLProtocolClient,
+         spyRegistry: SpyRegistry) {
         self.request = request
         self.client = client
+        self.spyRegistry = spyRegistry
     }
 
     func build() -> InterceptorURLProtocol {
-        return InterceptorURLProtocol(request: request,
-                                      cachedResponse: nil,
-                                      client: client)
+        let interceptor = InterceptorURLProtocol(request: request,
+                                                 cachedResponse: nil,
+                                                 client: client)
+
+        interceptor.spyRegistry = spyRegistry
+
+        return interceptor
     }
 }

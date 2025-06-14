@@ -12,19 +12,17 @@ import Testing
 
 struct InterceptorURLProtocolTests {
 
-    private let clientSpy: ProtocolClientSpy
-    private let interceptorBuilder: InterceptorBuilder
     private let spyRegistry: SpyRegistry
     private let spyBuilder: SpyBuilder
+    private let clientSpy: ProtocolClientSpy
+    private let interceptorBuilder: InterceptorBuilder
 
     init() {
-        self.clientSpy = ProtocolClientSpy()
-        self.interceptorBuilder = InterceptorBuilder(client: clientSpy)
         self.spyRegistry = SpyRegistry()
         self.spyBuilder = SpyBuilder(spyRegistry: spyRegistry)
-
-
-        //InterceptorURLProtocol.setSpyRegistry(spyRegistry)
+        self.clientSpy = ProtocolClientSpy()
+        self.interceptorBuilder = InterceptorBuilder(client: clientSpy,
+                                                     spyRegistry: spyRegistry)
     }
 
     @Test // TODO: More specific error cases (request with no spy, spy not found, response stub throws, http response could not be build)

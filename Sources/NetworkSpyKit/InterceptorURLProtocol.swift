@@ -9,7 +9,7 @@ import Foundation
 
 final class InterceptorURLProtocol: URLProtocol {
 
-    private let spyRegistry =  SpyRegistry.shared
+    var spyRegistry: SpyRegistry = .shared
 
     // MARK: - URLProtocol
 

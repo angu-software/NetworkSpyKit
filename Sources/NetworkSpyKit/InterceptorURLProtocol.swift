@@ -9,7 +9,19 @@ import Foundation
 
 final class InterceptorURLProtocol: URLProtocol {
 
+    enum Error: Swift.Error {
+        case spyNotFoundForRequest
+    }
+
     var spyRegistry: SpyRegistry = .shared
+
+    private func spy(for request: URLRequest) throws -> NetworkSpy {
+        guard let spy = spyRegistry.spy(for: request) else {
+            throw Error.spyNotFoundForRequest
+        }
+
+        return spy
+    }
 
     // MARK: - URLProtocol
 
@@ -23,13 +35,20 @@ final class InterceptorURLProtocol: URLProtocol {
     }
 
     override func startLoading() {
-        client?.urlProtocol(self,
-                            didReceive: HTTPURLResponse(url: URL(string: "https://example.com")!,
-                                                        statusCode: 418,
-                                                        httpVersion: nil,
-                                                        headerFields: nil)!,
-                            cacheStoragePolicy: .notAllowed)
-        client?.urlProtocol(self, didFailWithError: NSError(domain: "", code: 0, userInfo: nil))
+        do {
+            let spy = try spy(for: request)
+            let request = Request(httpMethod: "", url: URL(string: "https://example.com")!, headers: [:], bodyData: nil)
+            let response = try spy.responseProvider(request)
+            client?.urlProtocol(self,
+                                didReceive: HTTPURLResponse(url: URL(string: "https://example.com")!,
+                                                            statusCode: 418,
+                                                            httpVersion: nil,
+                                                            headerFields: nil)!,
+                                cacheStoragePolicy: .notAllowed)
+        } catch {
+            client?.urlProtocol(self, didFailWithError: error)
+        }
+
         client?.urlProtocolDidFinishLoading(self)
     }
 

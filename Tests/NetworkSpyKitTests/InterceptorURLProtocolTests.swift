@@ -12,6 +12,8 @@ import Testing
 
 struct InterceptorURLProtocolTests {
 
+    private typealias InterceptorError = InterceptorURLProtocol.Error
+
     private let spyRegistry: SpyRegistry
     private let spyBuilder: SpyBuilder
     private let clientSpy: ProtocolClientSpy
@@ -25,7 +27,8 @@ struct InterceptorURLProtocolTests {
                                                      spyRegistry: spyRegistry)
     }
 
-    @Test // TODO: More specific error cases (request with no spy, spy not found, response stub throws, http response could not be build)
+    // TODO: error when spy not found
+    @Test // TODO: More specific error cases (response stub throws, http response could not be build)
     func should_tell_client_when_loading_failed() async throws {
         let interceptor = interceptorBuilder.build()
 
@@ -33,6 +36,38 @@ struct InterceptorURLProtocolTests {
 
         // TODO: explicit error check
         #expect((clientSpy.didFailLoadingWithError as? NSError)?.code == 0)
+    }
+
+    @Test
+    func should_load_with_error_when_request_does_not_have_spy_assigned() async throws {
+        interceptorBuilder.request = .fixture(spyId: nil)
+        let interceptor = interceptorBuilder.build()
+
+        interceptor.startLoading()
+
+        #expect(clientSpy.didFailLoadingWithError as? InterceptorError == .spyNotFoundForRequest)
+    }
+
+    @Test
+    func should_load_with_error_when_request_assigned_spy_not_found() async throws {
+        interceptorBuilder.request = .fixture(spyId: "spy-id")
+        let interceptor = interceptorBuilder.build()
+
+        interceptor.startLoading()
+
+        #expect(clientSpy.didFailLoadingWithError as? InterceptorError == .spyNotFoundForRequest)
+    }
+
+    @Test
+    func should_load_with_error_thrown_from_spy_response_provider() async throws {
+        spyBuilder.responseProvider = { _ in throw TestingError.somethingWentWrong }
+        let spy = spyBuilder.build()
+        interceptorBuilder.request = .fixture(spyId: spy.id)
+        let interceptor = interceptorBuilder.build()
+
+        interceptor.startLoading()
+
+        #expect(clientSpy.didFailLoadingWithError as? TestingError == .somethingWentWrong)
     }
 
     @Test
@@ -67,6 +102,4 @@ struct InterceptorURLProtocolTests {
 
         #expect(clientSpy.didReceiveResponseCachePolicy == .notAllowed)
     }
-
-    // TODO: error when spy not found
 }

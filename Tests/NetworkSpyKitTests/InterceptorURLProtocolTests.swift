@@ -28,7 +28,7 @@ struct InterceptorURLProtocolTests {
     }
 
     // TODO: error when spy not found
-    @Test // TODO: More specific error cases (response stub throws, http response could not be build)
+    @Test // TODO: More specific error cases (http response could not be build)
     func should_tell_client_when_loading_failed() async throws {
         let interceptor = interceptorBuilder.build()
 
@@ -76,6 +76,7 @@ struct InterceptorURLProtocolTests {
 
         interceptor.startLoading()
 
+        try #require(clientSpy.didFailLoadingWithError != nil)
         #expect(clientSpy.didFinishLoading)
     }
 

@@ -25,9 +25,9 @@ final class InterceptorURLProtocol: URLProtocol {
     override func startLoading() {
         client?.urlProtocol(self,
                             didReceive: HTTPURLResponse(url: URL(string: "https://example.com")!,
-                                                              statusCode: 418,
-                                                              httpVersion: nil,
-                                                              headerFields: nil)!,
+                                                        statusCode: 418,
+                                                        httpVersion: nil,
+                                                        headerFields: nil)!,
                             cacheStoragePolicy: .notAllowed)
         client?.urlProtocol(self, didFailWithError: NSError(domain: "", code: 0, userInfo: nil))
         client?.urlProtocolDidFinishLoading(self)

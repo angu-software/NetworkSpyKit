@@ -37,13 +37,9 @@ final class InterceptorURLProtocol: URLProtocol {
     override func startLoading() {
         do {
             let spy = try spy(for: request)
-            let request = Request(httpMethod: "", url: URL(string: "https://example.com")!, headers: [:], bodyData: nil)
-            let response = try spy.responseProvider(request)
+            let response = try spy.response(for: request)
             client?.urlProtocol(self,
-                                didReceive: HTTPURLResponse(url: URL(string: "https://example.com")!,
-                                                            statusCode: 418,
-                                                            httpVersion: nil,
-                                                            headerFields: nil)!,
+                                didReceive: response,
                                 cacheStoragePolicy: .notAllowed)
         } catch {
             client?.urlProtocol(self, didFailWithError: error)
@@ -54,5 +50,27 @@ final class InterceptorURLProtocol: URLProtocol {
 
     override func stopLoading() {
         // No-op
+    }
+}
+
+extension NetworkSpy {
+
+    typealias Error = InterceptorURLProtocol.Error
+
+    func response(for urlRequest: URLRequest) throws -> HTTPURLResponse {
+        guard let request = Request(urlRequest: urlRequest) else {
+            throw Error.spyNotFoundForRequest // TODO: correct error
+        }
+
+        let response = try response(for: request)
+
+        return HTTPURLResponse(url: urlRequest.url!,
+                               statusCode: 418,
+                               httpVersion: nil,
+                               headerFields: nil)!
+    }
+
+    func response(for request: Request) throws -> Response {
+        return try responseProvider(request)
     }
 }

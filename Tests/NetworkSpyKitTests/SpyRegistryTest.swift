@@ -12,27 +12,19 @@ import Testing
 
 struct SpyRegistryTest {
 
+    private let spyRegistry: SpyRegistry
+    private let spyBuilder: SpyBuilder
+
+    init() {
+        self.spyRegistry = SpyRegistry()
+        self.spyBuilder = SpyBuilder(spyRegistry: spyRegistry)
+    }
+
     @Test
     func should_return_spy_for_URLRequest() async throws {
-        let registry = SpyRegistry()
-        let spy = makeSpy(spyRegistry: registry)
+        let spy = spyBuilder.build()
         let request: URLRequest = .fixture(spyId: spy.id)
 
-        #expect(registry.spy(for: request) === spy)
-    }
-
-    // MARK: Testing API
-
-    private func makeRequest(spyId: String) -> URLRequest {
-        var request = URLRequest(url: URL(string: "https://example.com")!)
-        request.allHTTPHeaderFields = [NetworkSpy.headerKey: spyId]
-
-        return request
-    }
-
-    private func makeSpy(spyRegistry: SpyRegistry) -> NetworkSpy {
-        return NetworkSpy(sessionConfiguration: .ephemeral,
-                             responseProvider: { _ in .teaPot },
-                             spyRegistry: spyRegistry)
+        #expect(spyRegistry.spy(for: request) === spy)
     }
 }

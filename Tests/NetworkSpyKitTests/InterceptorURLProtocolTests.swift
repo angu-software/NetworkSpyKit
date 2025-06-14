@@ -14,10 +14,12 @@ struct InterceptorURLProtocolTests {
 
     private let clientSpy: ProtocolClientSpy
     private let spyRegistry: SpyRegistry
+    private let spyBuilder: SpyBuilder
 
     init() {
         self.clientSpy = ProtocolClientSpy()
         self.spyRegistry = SpyRegistry()
+        self.spyBuilder = SpyBuilder(spyRegistry: spyRegistry)
 
         //InterceptorURLProtocol.setSpyRegistry(spyRegistry)
     }
@@ -43,9 +45,7 @@ struct InterceptorURLProtocolTests {
 
     @Test
     func should_receive_response_for_spy_request() async throws {
-        let spy = NetworkSpy(sessionConfiguration: .default,
-                             responseProvider: { _ in .teaPot },
-                             spyRegistry: spyRegistry)
+        let spy = spyBuilder.build()
 
         let interceptor = makeInterceptor(request: .fixture(spyId: spy.id))
 

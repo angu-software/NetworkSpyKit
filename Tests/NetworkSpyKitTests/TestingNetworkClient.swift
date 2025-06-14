@@ -17,10 +17,7 @@ final class TestingNetworkClient {
         self.session = URLSession(configuration: sessionConfiguration)
     }
 
-    func sendRequest() async throws -> NetworkSpy.Response {
-        var request = URLRequest(url: URL(string: "https://example.com")!)
-        request.httpMethod = "GET"
-
+    func sendRequest(_ request: URLRequest = .fixture()) async throws -> NetworkSpy.Response {
         let (data, urlResponse) =  try await session.data(for: request)
 
         let httpURLResponse = urlResponse as! HTTPURLResponse

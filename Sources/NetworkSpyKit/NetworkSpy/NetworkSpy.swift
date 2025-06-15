@@ -7,14 +7,36 @@
 
 import Foundation
 
+/// A test utility for intercepting and stubbing HTTP requests made through `URLSession`.
+///
+/// `NetworkSpy` provides a customizable `URLSessionConfiguration` that redirects all network
+/// traffic through a test interceptor, allowing you to inspect requests and return stubbed responses.
+/// This is primarily intended for use in unit and integration tests.
 public final class NetworkSpy: @unchecked Sendable {
 
+    /// A typealias for a closure that returns a stubbed response for a given request.
+    ///
+    /// You can assign a custom provider to simulate different network conditions or
+    /// test specific behaviors. The provider is invoked for each intercepted request.
     public typealias ResponseProvider = @Sendable (Request) throws -> StubbedResponse
+
+    /// The default response returned by the spy when no custom provider is set.
+    ///
+    /// Returns a 418 "I'm a teapot" response with JSON content.
+    /// Useful as a placeholder in test environments.
+    public static let defaultResponse: ResponseProvider = { _ in .teaPot }
 
     /// The `URLSessionConfiguration` associated with this spy.
     ///
-    /// A copy of the injected `URLSessionConfiguration` instance during initialization
+    /// This configuration is a copy of the one provided during initialization,
+    /// augmented with the required interceptor and identification headers.
+    /// Use this to construct a `URLSession` that is intercepted by the spy.
     public let sessionConfiguration: URLSessionConfiguration
+
+    /// The currently assigned response provider.
+    ///
+    /// Can be updated at runtime to dynamically change the stubbed response behavior.
+    /// Access to this property is thread-safe.
     public var responseProvider: ResponseProvider {
         get {
             queue.sync {
@@ -32,25 +54,32 @@ public final class NetworkSpy: @unchecked Sendable {
     let id: String = UUID().uuidString
 
     private let spyRegistry: SpyRegistry
-    private let queue: DispatchQueue = DispatchQueue(label: "\(NetworkSpy.self)-\(UUID().uuidString)",
+    private let queue: DispatchQueue = DispatchQueue(label: "\(NetworkSpy.self)-\(UUID().uuidString).queue",
                                                      attributes: .concurrent)
     private var _responseProvider: ResponseProvider
 
-    // TODO: tell that the injected session is a "template"
+    /// Creates a new `NetworkSpy` with a given `URLSessionConfiguration` and optional response provider.
+    ///
+    /// The configuration is copied and modified internally to inject the required interceptor.
+    /// Use the returned `sessionConfiguration` to create a `URLSession` that is monitored by the spy.
+    ///
+    /// - Parameters:
+    ///   - sessionConfiguration: A template configuration. It will be copied and modified.
+    ///   - responseProvider: A closure that returns a stubbed response for intercepted requests. Defaults to `.teaPot`.
     public convenience init(sessionConfiguration: URLSessionConfiguration,
-                            responseProvider: @escaping ResponseProvider) {
+                            responseProvider: @escaping ResponseProvider = defaultResponse) {
         self.init(sessionConfiguration: sessionConfiguration,
                   responseProvider: responseProvider,
                   spyRegistry: .shared)
     }
-    
+
     init(sessionConfiguration: URLSessionConfiguration,
-         responseProvider: @escaping ResponseProvider,
+         responseProvider: @escaping ResponseProvider = defaultResponse,
          spyRegistry: SpyRegistry) {
         self.sessionConfiguration = Self.copyConfiguration(sessionConfiguration)
         self._responseProvider = responseProvider
         self.spyRegistry = spyRegistry
-        
+
         setUp()
     }
 

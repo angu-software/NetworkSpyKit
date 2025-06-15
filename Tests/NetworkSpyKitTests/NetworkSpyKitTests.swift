@@ -22,7 +22,6 @@ struct NetworkSpyKitTests {
                             headers: ["Content-Type": "text/plain"],
                             data: "Hello spy!".data(using: .utf8))
         }
-
         let networkClient = NetworkClientFake(sessionConfiguration: spy.sessionConfiguration)
 
         let receivedResponse = try await networkClient.sendRequest()
@@ -37,7 +36,6 @@ struct NetworkSpyKitTests {
         let spy = NetworkSpy(sessionConfiguration: .default) { _ in
             throw TestingError.somethingWentWrong
         }
-
         let networkClient = NetworkClientFake(sessionConfiguration: spy.sessionConfiguration)
 
         do {
@@ -56,12 +54,20 @@ struct NetworkSpyKitTests {
             throw TestingError.somethingWentWrong
         }
         let networkClient = NetworkClientFake(sessionConfiguration: spy.sessionConfiguration)
+
         spy.responseProvider = { _ in return .teaPot }
+
+        let response = try await networkClient.sendRequest()
+        #expect(response == .teaPot)
+    }
+
+    @Test
+    func should_provide_default_response_provider_at_initalization() async throws {
+        let spy = NetworkSpy(sessionConfiguration: .default)
+        let networkClient = NetworkClientFake(sessionConfiguration: spy.sessionConfiguration)
 
         let response = try await networkClient.sendRequest()
 
         #expect(response == .teaPot)
     }
-
-    // Default response provider
 }

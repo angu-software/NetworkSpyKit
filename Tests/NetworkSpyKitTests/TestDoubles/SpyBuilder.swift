@@ -16,7 +16,7 @@ final class SpyBuilder {
     let spyRegistry: SpyRegistry
 
     init(sessionConfiguration: URLSessionConfiguration = .default,
-         responseProvider: @escaping NetworkSpy.ResponseProvider = { _ in .teaPot },
+         responseProvider: @escaping NetworkSpy.ResponseProvider = NetworkSpy.defaultResponse,
          spyRegistry: SpyRegistry) {
         self.sessionConfiguration = sessionConfiguration
         self.responseProvider = responseProvider

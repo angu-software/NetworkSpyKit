@@ -12,7 +12,7 @@ import Foundation
 /// `NetworkSpy` provides a customizable `URLSessionConfiguration` that redirects all network
 /// traffic through a test interceptor, allowing you to inspect requests and return stubbed responses.
 /// This is primarily intended for use in unit and integration tests.
-public final class NetworkSpy {
+public final class NetworkSpy: Sendable {
 
     /// A typealias for a closure that returns a stubbed response for a given request.
     ///
@@ -39,10 +39,10 @@ public final class NetworkSpy {
     /// Access to this property is thread-safe.
     public var responseProvider: ResponseProvider {
         get {
-            responseStore.responseProvider
+            responseStore.value
         }
         set {
-            responseStore.responseProvider = newValue
+            responseStore.value = newValue
         }
     }
 
@@ -71,7 +71,7 @@ public final class NetworkSpy {
          responseProvider: @escaping ResponseProvider = defaultResponse,
          spyRegistry: SpyRegistry) {
         self.sessionConfiguration = Self.copyConfiguration(sessionConfiguration)
-        self.responseStore = SafeResponseStore(responseProvider: responseProvider)
+        self.responseStore = SafeResponseStore(value: responseProvider)
         self.spyRegistry = spyRegistry
 
         setUp()

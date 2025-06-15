@@ -12,7 +12,7 @@ import Foundation
 /// `NetworkSpy` provides a customizable `URLSessionConfiguration` that redirects all network
 /// traffic through a test interceptor, allowing you to inspect requests and return stubbed responses.
 /// This is primarily intended for use in unit and integration tests.
-public final class NetworkSpy: @unchecked Sendable {
+public final class NetworkSpy {
 
     /// A typealias for a closure that returns a stubbed response for a given request.
     ///
@@ -39,14 +39,10 @@ public final class NetworkSpy: @unchecked Sendable {
     /// Access to this property is thread-safe.
     public var responseProvider: ResponseProvider {
         get {
-            queue.sync {
-                return self._responseProvider
-            }
+            responseStore.responseProvider
         }
         set {
-            queue.async(flags: .barrier) {
-                self._responseProvider = newValue
-            }
+            responseStore.responseProvider = newValue
         }
     }
 
@@ -54,9 +50,7 @@ public final class NetworkSpy: @unchecked Sendable {
     let id: String = UUID().uuidString
 
     private let spyRegistry: SpyRegistry
-    private let queue: DispatchQueue = DispatchQueue(label: "\(NetworkSpy.self)-\(UUID().uuidString).queue",
-                                                     attributes: .concurrent)
-    private var _responseProvider: ResponseProvider
+    private let responseStore: SafeResponseStore
 
     /// Creates a new `NetworkSpy` with a given `URLSessionConfiguration` and optional response provider.
     ///
@@ -77,7 +71,7 @@ public final class NetworkSpy: @unchecked Sendable {
          responseProvider: @escaping ResponseProvider = defaultResponse,
          spyRegistry: SpyRegistry) {
         self.sessionConfiguration = Self.copyConfiguration(sessionConfiguration)
-        self._responseProvider = responseProvider
+        self.responseStore = SafeResponseStore(responseProvider: responseProvider)
         self.spyRegistry = spyRegistry
 
         setUp()

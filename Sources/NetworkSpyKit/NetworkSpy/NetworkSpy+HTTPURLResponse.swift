@@ -18,14 +18,26 @@ extension NetworkSpy {
 
         let response = try response(for: request)
 
-        return (HTTPURLResponse(url: urlRequest.url!,
-                               statusCode: response.statusCode,
-                               httpVersion: nil,
-                               headerFields: response.headers)!,
+        return (makeHTTPURLResponse(requestURL: urlRequest.url,
+                                    stubbedResponse: response),
                 response.data)
     }
 
     private func response(for request: Request) throws -> Response {
         return try responseProvider(request)
+    }
+
+    private func makeHTTPURLResponse(requestURL: URL?, stubbedResponse: Response) -> HTTPURLResponse {
+        guard let requestURL,
+              let httpResponse = HTTPURLResponse(url: requestURL,
+                                                 statusCode: stubbedResponse.statusCode,
+                                                 httpVersion: nil,
+                                                 headerFields: stubbedResponse.headers) else {
+            // We expect HTTPURLResponse.init to actually never fail.
+            // We could not come up with parameters combination that will fail the init.
+            fatalError("Unexpected failure creating HTTPURLResponse – Invalid parameters for HTTPURLResponse")
+        }
+
+        return httpResponse
     }
 }

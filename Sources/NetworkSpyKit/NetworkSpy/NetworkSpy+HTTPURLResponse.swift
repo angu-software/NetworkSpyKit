@@ -16,15 +16,11 @@ extension NetworkSpy {
             throw Error.couldNotCreateRequestForSpy
         }
 
-        let response = try response(for: request)
+        let stubbedResponse = try responseProvider(request)
 
         return (makeHTTPURLResponse(requestURL: urlRequest.url,
-                                    stubbedResponse: response),
-                response.data)
-    }
-
-    private func response(for request: Request) throws -> Response {
-        return try responseProvider(request)
+                                    stubbedResponse: stubbedResponse),
+                stubbedResponse.data)
     }
 
     private func makeHTTPURLResponse(requestURL: URL?, stubbedResponse: Response) -> HTTPURLResponse {

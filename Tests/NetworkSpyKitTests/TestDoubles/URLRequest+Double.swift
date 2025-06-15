@@ -9,7 +9,7 @@ import Foundation
 
 @testable import NetworkSpyKit
 
-extension URLRequest {
+extension Request {
 
     static func fixture(url: URL = URL(string: "https://example.com")!,
                         httpMethod: String = "GET",
@@ -17,19 +17,13 @@ extension URLRequest {
                         httpBody: Data? = nil,
                         httpBodyStream: InputStream? = nil,
                         spyId: String? = nil) -> Self {
-        var fixture = Self(url: url)
-        fixture.httpMethod = httpMethod
-
-        var allHeadersFields = httpHeaderFields
+        var fixture = Self(url: url,
+                           httpMethod: httpMethod,
+                           allHTTPHeaderFields: httpHeaderFields,
+                           httpBody: httpBody,
+                           httpBodyStream: httpBodyStream)
         if let spyId {
-            allHeadersFields[NetworkSpy.headerKey] = spyId
-        }
-
-        fixture.allHTTPHeaderFields = allHeadersFields
-        if let httpBody {
-            fixture.httpBody = httpBody
-        } else {
-            fixture.httpBodyStream = httpBodyStream
+            fixture.allHTTPHeaderFields?[NetworkSpy.headerKey] = spyId
         }
 
         return fixture

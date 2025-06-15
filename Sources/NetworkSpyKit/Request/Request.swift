@@ -7,21 +7,23 @@
 
 import Foundation
 
-/// A Simplified representation of an URLRequest
-public struct Request: Equatable, Sendable {
+public typealias Request = URLRequest
 
-    public let httpMethod: String
-    public let url: URL
-    public let headers: [String: String]
-    public let bodyData: Data?
+extension URLRequest {
 
-    public init(httpMethod: String,
-                url: URL,
-                headers: [String: String],
-                bodyData: Data?) {
+    public init(url: URL,
+                httpMethod: String = "GET",
+                allHTTPHeaderFields: [String: String]? = nil,
+                httpBody: Data? = nil,
+                httpBodyStream: InputStream? = nil) {
+        self.init(url: url)
         self.httpMethod = httpMethod
-        self.url = url
-        self.headers = headers
-        self.bodyData = bodyData
+        self.allHTTPHeaderFields = allHTTPHeaderFields
+
+        if let httpBodyStream {
+            self.httpBodyStream = httpBodyStream
+        } else if let httpBody {
+            self.httpBody = httpBody
+        }
     }
 }

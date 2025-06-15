@@ -9,7 +9,7 @@ import Foundation
 
 public final class NetworkSpy: Sendable {
 
-    public typealias ResponseProvider = @Sendable (Request) throws -> Response
+    public typealias ResponseProvider = @Sendable (Request) throws -> StubbedResponse
 
     /// The `URLSessionConfiguration` associated with this spy.
     ///

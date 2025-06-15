@@ -110,7 +110,7 @@ struct InterceptorURLProtocolTests {
     @Test
     func should_tell_client_when_data_was_loaded() async throws {
         let responseData = "Hello".data(using: .utf8)!
-        let responseWithData = NetworkSpy.Response(statusCode: 200, data: responseData)
+        let responseWithData = NetworkSpy.StubbedResponse(statusCode: 200, data: responseData)
         spyBuilder.responseProvider = { _ in return responseWithData }
         let spy = spyBuilder.build()
 

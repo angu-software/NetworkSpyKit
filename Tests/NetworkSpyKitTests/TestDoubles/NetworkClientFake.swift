@@ -17,12 +17,12 @@ final class NetworkClientFake {
         self.session = URLSession(configuration: sessionConfiguration)
     }
 
-    func sendRequest(_ request: URLRequest = .fixture()) async throws -> NetworkSpy.Response {
+    func sendRequest(_ request: URLRequest = .fixture()) async throws -> NetworkSpy.StubbedResponse {
         let (data, urlResponse) =  try await session.data(for: request)
 
         let httpURLResponse = urlResponse as! HTTPURLResponse
 
-        return NetworkSpy.Response(statusCode: httpURLResponse.statusCode,
+        return NetworkSpy.StubbedResponse(statusCode: httpURLResponse.statusCode,
                                    headers: httpURLResponse.allHeaderFields as! [String: String],
                                    data: data)
     }

@@ -31,7 +31,7 @@ struct NetworkSpyResponseMappingTests {
 
     @Test
     func should_retrun_httpURLResponse_stubbed_status_code() async throws {
-        spyBuilder.responseProvider = { _ in return NetworkSpy.Response(statusCode: 203) }
+        spyBuilder.responseProvider = { _ in return NetworkSpy.StubbedResponse(statusCode: 203) }
         let spy = spyBuilder.build()
         let urlRequest = URLRequest.fixture(spyId: spy.id)
 
@@ -43,7 +43,7 @@ struct NetworkSpyResponseMappingTests {
     @Test
     func should_retrun_httpURLResponse_stubbed_headers() async throws {
         let responseHeaders = ["X-Message": "Hello"]
-        let stubbedResponse = NetworkSpy.Response(statusCode: 203, headers: responseHeaders)
+        let stubbedResponse = NetworkSpy.StubbedResponse(statusCode: 203, headers: responseHeaders)
         spyBuilder.responseProvider = { _ in return stubbedResponse }
         let spy = spyBuilder.build()
         let urlRequest = URLRequest.fixture(spyId: spy.id)

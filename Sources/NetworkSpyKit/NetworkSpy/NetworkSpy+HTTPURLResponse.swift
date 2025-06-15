@@ -23,7 +23,7 @@ extension NetworkSpy {
                 stubbedResponse.data)
     }
 
-    private func makeHTTPURLResponse(requestURL: URL?, stubbedResponse: Response) -> HTTPURLResponse {
+    private func makeHTTPURLResponse(requestURL: URL?, stubbedResponse: StubbedResponse) -> HTTPURLResponse {
         guard let requestURL,
               let httpResponse = HTTPURLResponse(url: requestURL,
                                                  statusCode: stubbedResponse.statusCode,

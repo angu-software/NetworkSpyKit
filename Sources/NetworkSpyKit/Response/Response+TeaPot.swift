@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension NetworkSpy.Response {
+extension NetworkSpy.StubbedResponse {
 
     /// A stub response based on the [Hyper Text Coffee Pot Control Protocol](https://en.wikipedia.org/wiki/Hyper_Text_Coffee_Pot_Control_Protocol),
     /// returning HTTP status code 418 — *"I'm a teapot"*.

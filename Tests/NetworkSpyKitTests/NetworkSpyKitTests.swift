@@ -4,7 +4,7 @@ import NetworkSpyKit
 
 struct NetworkSpyKitTests {
 
-    private typealias Response = NetworkSpy.Response
+    private typealias Response = NetworkSpy.StubbedResponse
 
     @Test
     func should_return_stubbed_response() async throws {

@@ -11,7 +11,7 @@ final class InterceptorURLProtocol: URLProtocol {
 
     enum Error: Swift.Error {
         case spyNotFoundForRequest
-        case couldNotCreateRequestForSpy
+        case invalidRequestURLMissing
     }
 
     var spyRegistry: SpyRegistry = .shared

@@ -12,11 +12,11 @@ extension NetworkSpy {
     typealias Error = InterceptorURLProtocol.Error
 
     func response(for urlRequest: URLRequest) throws -> (response: HTTPURLResponse, data: Data?) {
-        guard let request = Request(urlRequest: urlRequest) else {
-            throw Error.couldNotCreateRequestForSpy
+        guard urlRequest.url != nil else {
+            throw Error.invalidRequestURLMissing
         }
 
-        let stubbedResponse = try responseProvider(request)
+        let stubbedResponse = try responseProvider(urlRequest)
 
         return (makeHTTPURLResponse(requestURL: urlRequest.url,
                                     stubbedResponse: stubbedResponse),

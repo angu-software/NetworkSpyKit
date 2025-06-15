@@ -40,7 +40,7 @@ final class InterceptorURLProtocol: URLProtocol {
             let spy = try spy(for: request)
             let response = try spy.response(for: request)
             client?.urlProtocol(self,
-                                didReceive: response,
+                                didReceive: response.response,
                                 cacheStoragePolicy: .notAllowed)
         } catch {
             client?.urlProtocol(self, didFailWithError: error)

@@ -24,7 +24,7 @@ struct NetworkSpyResponseMappingTests {
         let spy = spyBuilder.build()
         let urlRequest = URLRequest.fixture(spyId: spy.id)
 
-        let httpResponse = try spy.response(for: urlRequest)
+        let httpResponse = try spy.response(for: urlRequest).response
 
         #expect(httpResponse.url == urlRequest.url)
     }
@@ -35,7 +35,7 @@ struct NetworkSpyResponseMappingTests {
         let spy = spyBuilder.build()
         let urlRequest = URLRequest.fixture(spyId: spy.id)
 
-        let httpResponse = try spy.response(for: urlRequest)
+        let httpResponse = try spy.response(for: urlRequest).response
 
         #expect(httpResponse.statusCode == 203)
     }
@@ -48,7 +48,7 @@ struct NetworkSpyResponseMappingTests {
         let spy = spyBuilder.build()
         let urlRequest = URLRequest.fixture(spyId: spy.id)
 
-        let httpResponse = try spy.response(for: urlRequest)
+        let httpResponse = try spy.response(for: urlRequest).response
 
         #expect(httpResponse.allHeaderFields as? [String: String] == responseHeaders)
     }

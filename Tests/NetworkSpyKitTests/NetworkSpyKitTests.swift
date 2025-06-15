@@ -25,8 +25,6 @@ struct NetworkSpyKitTests {
         }
     }
 
-    // TODO: error when spy not found
-    // TODO: httpURLResponse from spy
     // TODO: throwing responseProvider
     // TODO: load data
     // TODO: change provider after initialization

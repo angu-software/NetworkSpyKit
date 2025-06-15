@@ -60,4 +60,6 @@ struct NetworkSpyTest {
     }
 
     // TODO: Remove spy binding header from request before it is provided to the responseProvider
+    // TODO: response has request url
+    // TODO: response has header, status code, data, httpversion ... of spy response
 }

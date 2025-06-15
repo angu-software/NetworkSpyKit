@@ -9,7 +9,6 @@ import Foundation
 
 extension NetworkSpy {
     // TODO: HTTPVersion!
-    // TODO: url from request
 
     public struct Response: Equatable, Sendable {
         var statusCode: Int

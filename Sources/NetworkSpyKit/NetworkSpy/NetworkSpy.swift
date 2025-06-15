@@ -22,6 +22,7 @@ public final class NetworkSpy: Sendable {
 
     private let spyRegistry: SpyRegistry
 
+    // TODO: tell that the injected session is a "template"
     public convenience init(sessionConfiguration: URLSessionConfiguration,
                             responseProvider: @escaping ResponseProvider) {
         self.init(sessionConfiguration: sessionConfiguration,

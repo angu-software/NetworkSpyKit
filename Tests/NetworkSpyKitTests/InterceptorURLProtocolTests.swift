@@ -27,16 +27,7 @@ struct InterceptorURLProtocolTests {
                                                      spyRegistry: spyRegistry)
     }
 
-    // TODO: error when spy not found
-    @Test // TODO: More specific error cases (http response could not be build)
-    func should_tell_client_when_loading_failed() async throws {
-        let interceptor = interceptorBuilder.build()
-
-        interceptor.startLoading()
-
-        // TODO: explicit error check
-        #expect((clientSpy.didFailLoadingWithError as? NSError)?.code == 0)
-    }
+    // TODO: More specific error cases (http response could not be build)
 
     @Test
     func should_load_with_error_when_request_does_not_have_spy_assigned() async throws {
@@ -103,6 +94,9 @@ struct InterceptorURLProtocolTests {
 
         #expect((clientSpy.didReceiveResponse as? HTTPURLResponse)?.statusCode == 418)
     }
+
+    // response has request url
+    // response has header, status code, data, httpversion ... of spy response
 
     @Test
     func should_not_cache_responses() async throws {

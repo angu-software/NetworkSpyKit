@@ -53,25 +53,3 @@ final class InterceptorURLProtocol: URLProtocol {
         // No-op
     }
 }
-
-extension NetworkSpy {
-
-    typealias Error = InterceptorURLProtocol.Error
-
-    func response(for urlRequest: URLRequest) throws -> HTTPURLResponse {
-        guard let request = Request(urlRequest: urlRequest) else {
-            throw Error.couldNotCreateRequestForSpy
-        }
-
-        let response = try response(for: request)
-
-        return HTTPURLResponse(url: urlRequest.url!,
-                               statusCode: 418,
-                               httpVersion: nil,
-                               headerFields: nil)!
-    }
-
-    private func response(for request: Request) throws -> Response {
-        return try responseProvider(request)
-    }
-}

@@ -43,7 +43,8 @@ struct NetworkSpyResponseMappingTests {
     @Test
     func should_retrun_httpURLResponse_stubbed_headers() async throws {
         let responseHeaders = ["X-Message": "Hello"]
-        spyBuilder.responseProvider = { _ in return NetworkSpy.Response(statusCode: 203, headers: responseHeaders) }
+        let stubbedResponse = NetworkSpy.Response(statusCode: 203, headers: responseHeaders)
+        spyBuilder.responseProvider = { _ in return stubbedResponse }
         let spy = spyBuilder.build()
         let urlRequest = URLRequest.fixture(spyId: spy.id)
 
@@ -51,7 +52,4 @@ struct NetworkSpyResponseMappingTests {
 
         #expect(httpResponse.allHeaderFields as? [String: String] == responseHeaders)
     }
-
-    // TODO: httpVersion
-    // TODO: cant map to HTTPURLResponse
 }

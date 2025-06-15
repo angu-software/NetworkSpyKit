@@ -42,6 +42,11 @@ final class InterceptorURLProtocol: URLProtocol {
             client?.urlProtocol(self,
                                 didReceive: response.response,
                                 cacheStoragePolicy: .notAllowed)
+
+            if let responseData = response.data {
+                client?.urlProtocol(self,
+                                    didLoad: responseData)
+            }
         } catch {
             client?.urlProtocol(self, didFailWithError: error)
         }

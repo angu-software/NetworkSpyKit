@@ -95,9 +95,6 @@ struct InterceptorURLProtocolTests {
         #expect((clientSpy.didReceiveResponse as? HTTPURLResponse)?.statusCode == 418)
     }
 
-    // response has request url
-    // response has header, status code, data, httpversion ... of spy response
-
     @Test
     func should_not_cache_responses() async throws {
         let spy = spyBuilder.build()
@@ -108,5 +105,20 @@ struct InterceptorURLProtocolTests {
         interceptor.startLoading()
 
         #expect(clientSpy.didReceiveResponseCachePolicy == .notAllowed)
+    }
+
+    @Test
+    func should_tell_client_when_data_was_loaded() async throws {
+        let responseData = "Hello".data(using: .utf8)!
+        let responseWithData = NetworkSpy.Response(statusCode: 200, data: responseData)
+        spyBuilder.responseProvider = { _ in return responseWithData }
+        let spy = spyBuilder.build()
+
+        interceptorBuilder.request = .fixture(spyId: spy.id)
+        let interceptor = interceptorBuilder.build()
+
+        interceptor.startLoading()
+
+        #expect(clientSpy.didLoadData == responseData)
     }
 }

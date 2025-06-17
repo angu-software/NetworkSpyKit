@@ -119,4 +119,23 @@ struct InterceptorURLProtocolTests {
 
         #expect(clientSpy.didLoadData == responseData)
     }
+
+    @Test
+    func should_remove_binding_header_from_request_when_provided_to_response_provider() async throws {
+        let box = ThreadSafeBox<URLRequest?>(value: nil)
+        spyBuilder.responseProvider = { request in
+            box.value = request
+            return .teaPot
+        }
+        let spy = spyBuilder.build()
+
+        interceptorBuilder.request = .fixture(httpHeaderFields: ["SomeHeaderKey": "Value"],
+                                              spyId: spy.id)
+        let interceptor = interceptorBuilder.build()
+
+        interceptor.startLoading()
+
+        let headers = try #require(box.value?.allHTTPHeaderFields)
+        #expect(headers.keys.contains(NetworkSpy.headerKey) == false)
+    }
 }

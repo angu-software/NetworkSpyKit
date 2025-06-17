@@ -58,21 +58,4 @@ struct NetworkSpyTest {
 
         #expect(spyRegistry.spy(byId: spyId) == nil)
     }
-
-    @Test
-    func should_remove_binding_header_from_request_when_provided_to_response_provider() async throws {
-        let spy = spyBuilder.build()
-        let box = ThreadSafeBox<URLRequest?>(value: nil)
-
-        spy.responseProvider = { request in
-            box.value = request
-            return .teaPot
-        }
-
-        _ = try spy.response(for: .fixture(httpHeaderFields: ["SomeHeaderKey": "Value"],
-                                           spyId: spy.id))
-
-        let headers = try #require(box.value?.allHTTPHeaderFields)
-        #expect(headers.keys.contains(NetworkSpy.headerKey) == false)
-    }
 }

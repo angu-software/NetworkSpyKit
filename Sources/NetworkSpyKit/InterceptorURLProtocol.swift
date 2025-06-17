@@ -63,7 +63,6 @@ final class InterceptorURLProtocol: URLProtocol {
     }
 
     override class func canonicalRequest(for request: URLRequest) -> URLRequest {
-        // TODO: canonicazor to sort query parameters for reliable comparison
         return request
     }
     

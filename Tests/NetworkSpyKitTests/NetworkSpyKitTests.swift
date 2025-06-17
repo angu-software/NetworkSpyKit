@@ -70,4 +70,19 @@ struct NetworkSpyKitTests {
 
         #expect(response == .teaPot)
     }
+
+    @Test
+    func should_record_requests() async throws {
+        let spy = NetworkSpy(sessionConfiguration: .default)
+        let networkClient = NetworkClientFake(sessionConfiguration: spy.sessionConfiguration)
+
+        _ = try await networkClient.sendRequest()
+        _ = try await networkClient.sendRequest()
+
+        withKnownIssue("Needs thread safe recorder type") {
+            #expect(spy.recordedRequests.count == 2)
+        }
+    }
+
+    // TODO: record also failing requests
 }

@@ -46,6 +46,10 @@ public final class NetworkSpy: Sendable {
         }
     }
 
+    public var recordedRequests: [Request] {
+        return []
+    }
+
     static let headerKey = "X-NetworkSpy-ID"
     let id: String = UUID().uuidString
 

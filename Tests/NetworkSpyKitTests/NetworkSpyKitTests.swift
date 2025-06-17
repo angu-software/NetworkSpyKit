@@ -79,10 +79,9 @@ struct NetworkSpyKitTests {
         _ = try await networkClient.sendRequest()
         _ = try await networkClient.sendRequest()
 
-        withKnownIssue("Needs thread safe recorder type") {
-            #expect(spy.recordedRequests.count == 2)
-        }
+        #expect(spy.recordedRequests.count == 2)
     }
 
+    // TODO: recorded request doe snot have syp id header
     // TODO: record also failing requests
 }

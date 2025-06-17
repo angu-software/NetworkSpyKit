@@ -36,10 +36,6 @@ extension NetworkSpy {
 
         return httpResponse
     }
-
-    private func removeSpyIDHeader(from urlRequest: inout URLRequest) {
-        urlRequest.setValue(nil, forHTTPHeaderField: NetworkSpy.headerKey)
-    }
 }
 
 extension URLRequest {

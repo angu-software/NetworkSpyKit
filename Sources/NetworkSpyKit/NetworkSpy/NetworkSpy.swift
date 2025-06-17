@@ -47,7 +47,7 @@ public final class NetworkSpy: Sendable {
     }
 
     public var recordedRequests: [Request] {
-        return []
+        return requestRecorder.recordedRequests
     }
 
     static let headerKey = "X-NetworkSpy-ID"
@@ -55,6 +55,7 @@ public final class NetworkSpy: Sendable {
 
     private let spyRegistry: SpyRegistry
     private let responseStore: SafeResponseStore
+    private let requestRecorder: RequestRecorder
 
     /// Creates a new `NetworkSpy` with a given `URLSessionConfiguration` and optional response provider.
     ///
@@ -77,12 +78,17 @@ public final class NetworkSpy: Sendable {
         self.sessionConfiguration = Self.copyConfiguration(sessionConfiguration)
         self.responseStore = SafeResponseStore(value: responseProvider)
         self.spyRegistry = spyRegistry
+        self.requestRecorder = RequestRecorder()
 
         setUp()
     }
 
     deinit {
         unregisterFromRegistry()
+    }
+
+    func record(_ request: URLRequest) {
+        requestRecorder.record(request)
     }
 
     private static func copyConfiguration(_ configuration: URLSessionConfiguration) -> URLSessionConfiguration {

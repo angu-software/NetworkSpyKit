@@ -27,8 +27,6 @@ struct InterceptorURLProtocolTests {
                                                      spyRegistry: spyRegistry)
     }
 
-    // TODO: More specific error cases (http response could not be build)
-
     @Test
     func should_load_with_error_when_request_does_not_have_spy_assigned() async throws {
         interceptorBuilder.request = .fixture(spyId: nil)

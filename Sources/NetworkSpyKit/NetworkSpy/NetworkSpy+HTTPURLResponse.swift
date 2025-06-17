@@ -16,7 +16,7 @@ extension NetworkSpy {
             throw Error.invalidRequestURLMissing
         }
 
-        let stubbedResponse = try responseProvider(urlRequest)
+        let stubbedResponse = try responseProvider(urlRequest.removedSpyIDHeader())
 
         return (makeHTTPURLResponse(requestURL: urlRequest.url,
                                     stubbedResponse: stubbedResponse),
@@ -35,5 +35,18 @@ extension NetworkSpy {
         }
 
         return httpResponse
+    }
+
+    private func removeSpyIDHeader(from urlRequest: inout URLRequest) {
+        urlRequest.setValue(nil, forHTTPHeaderField: NetworkSpy.headerKey)
+    }
+}
+
+extension URLRequest {
+
+    fileprivate func removedSpyIDHeader() -> Self {
+        var copy = self
+        copy.setValue(nil, forHTTPHeaderField: NetworkSpy.headerKey)
+        return copy
     }
 }

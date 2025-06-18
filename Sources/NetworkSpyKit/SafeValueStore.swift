@@ -7,8 +7,6 @@
 
 import Foundation
 
-// TODO: PRoperty wrapper
-
 final class SafeValueStore<Value: Sendable>: @unchecked Sendable {
 
     var value: Value {

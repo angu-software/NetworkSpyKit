@@ -8,5 +8,3 @@
 import Foundation
 
 typealias SafeResponseStore = SafeValueStore<NetworkSpy.ResponseProvider>
-
-

@@ -1,0 +1,22 @@
+name: Lint Podspec
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  podspec-lint:
+    runs-on: macos-15
+    env:
+        DEVELOPER_DIR: /Applications/Xcode_16.3.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Ruby, install dependencies, and cache gems
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Lint Podspec
+        run: pod lib lint NetworkSpyKit.podspec --verbose --allow-warnings

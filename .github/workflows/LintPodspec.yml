@@ -19,4 +19,4 @@ jobs:
           bundler-cache: true
 
       - name: Lint Podspec
-        run: pod lib lint NetworkSpyKit.podspec --verbose --allow-warnings
+        run: pod lib lint NetworkSpyKit.podspec --allow-warnings

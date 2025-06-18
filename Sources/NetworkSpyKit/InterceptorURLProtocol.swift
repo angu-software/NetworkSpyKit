@@ -19,9 +19,10 @@ final class InterceptorURLProtocol: URLProtocol {
     private func response(for request: URLRequest) throws -> (response: HTTPURLResponse, data: Data?) {
         let spy = try spy(for: request)
 
-        spy.record(request)
+        let normlizedRequest = request.removedSpyIDHeader()
+        spy.record(normlizedRequest)
 
-        return try spy.response(for: request)
+        return try spy.response(for: normlizedRequest)
     }
 
     private func spy(for request: URLRequest) throws -> NetworkSpy {
@@ -81,5 +82,15 @@ final class InterceptorURLProtocol: URLProtocol {
 
     override func stopLoading() {
         // No-op
+    }
+}
+
+
+extension URLRequest {
+
+    fileprivate func removedSpyIDHeader() -> Self {
+        var copy = self
+        copy.setValue(nil, forHTTPHeaderField: NetworkSpy.headerKey)
+        return copy
     }
 }

@@ -138,4 +138,18 @@ struct InterceptorURLProtocolTests {
         let headers = try #require(box.value?.allHTTPHeaderFields)
         #expect(headers.keys.contains(NetworkSpy.headerKey) == false)
     }
+
+    @Test
+    func should_remove_binding_header_from_request_recorded() async throws {
+        let spy = spyBuilder.build()
+
+        interceptorBuilder.request = .fixture(httpHeaderFields: ["SomeHeaderKey": "Value"],
+                                              spyId: spy.id)
+        let interceptor = interceptorBuilder.build()
+
+        interceptor.startLoading()
+
+        let recordedRequest = try #require(spy.recordedRequests.first)
+        #expect(recordedRequest.allHTTPHeaderFields?[NetworkSpy.headerKey] == nil)
+    }
 }

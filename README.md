@@ -1,5 +1,7 @@
 # 🕵 NetworkSpyKit
 
+[![Run Tests](https://github.com/angu-software/NetworkSpyKit/actions/workflows/ci.yml/badge.svg)](https://github.com/angu-software/NetworkSpyKit/actions/workflows/ci.yml)
+
 `NetworkSpyKit` is a lightweight, thread-safe HTTP spy and stub tool for testing code that performs network requests in Swift.
 
 It allows you to:

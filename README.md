@@ -97,6 +97,19 @@ Then import it where needed:
 import NetworkSpyKit
 ```
 
+**CocoaPods**
+
+Add the following line to your Podfile:
+
+```ruby
+pod 'NetworkSpyKit'
+```
+
+Then run:
+
+```sh
+pod install
+```
 ---
 
 ## 📄 License

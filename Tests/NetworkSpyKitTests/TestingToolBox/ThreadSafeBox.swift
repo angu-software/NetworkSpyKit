@@ -9,8 +9,7 @@ import Foundation
 
 final class ThreadSafeBox<Value: Sendable>: @unchecked Sendable {
 
-    private let queue = DispatchQueue(label: "ThreadSafeBox.queue",
-                                      attributes: .concurrent)
+    private let queue = DispatchQueue(label: "ThreadSafeBox.queue")
     private var _value: Value
 
     var value: Value {

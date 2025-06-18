@@ -19,8 +19,7 @@ final class SpyRegistry: @unchecked Sendable {
 
     static let shared = SpyRegistry()
 
-    private let queue = DispatchQueue(label: "com.angu-software.NetworkSpyKit.SpyRegistry",
-                                      attributes: .concurrent)
+    private let queue = DispatchQueue(label: "com.angu-software.NetworkSpyKit.SpyRegistry")
     private var registry: [String: WeakSpy] = [:]
 
     func register(_ spy: NetworkSpy) {

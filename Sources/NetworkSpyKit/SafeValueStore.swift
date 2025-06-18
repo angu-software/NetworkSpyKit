@@ -24,8 +24,7 @@ final class SafeValueStore<Value: Sendable>: @unchecked Sendable {
         }
     }
 
-    private let queue: DispatchQueue = DispatchQueue(label: "com.angu-software.SafeValueStore.queue",
-                                                     attributes: .concurrent)
+    private let queue: DispatchQueue = DispatchQueue(label: "com.angu-software.SafeValueStore.queue",)
 
     private var _value: Value
 

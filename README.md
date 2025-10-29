@@ -1,5 +1,7 @@
 # 🕵 NetworkSpyKit
 
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fangu-software%2FNetworkSpyKit%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/angu-software/NetworkSpyKit)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fangu-software%2FNetworkSpyKit%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/angu-software/NetworkSpyKit)
 [![Run Tests](https://github.com/angu-software/NetworkSpyKit/actions/workflows/ci.yml/badge.svg)](https://github.com/angu-software/NetworkSpyKit/actions/workflows/ci.yml)
 
 `NetworkSpyKit` is a lightweight, thread-safe HTTP spy and stub tool for testing code that performs network requests in Swift.

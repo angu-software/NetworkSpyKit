@@ -220,6 +220,43 @@ struct MyNetworkingTest {
 
 ---
 
+## 📥 Responses
+
+`NetworkSpyKit` contains convenient StubbedResponses to reduce redundancy. 
+
+This includes standard HTTP responses like
+
+| Response                  | StubbedResponse      |
+|---------------------------|----------------------|
+| 200 OK                    | .ok                  |
+| 404 NOT FOUND             | .notFound            |
+| 500 INTERNAL SERVER ERROR | .internalServerError |
+| 501 NOT IMPLEMENTED       | .notImplemented      |
+
+See [CommonResponses](Sources/NetworkSpyKit/Response/CommonResponses) for more convenient response implementations.
+
+In addition it provides a convenient way to create json responses
+
+* Use `StubbedResponse.json(statusCode:_:jsonFormattingOptions:)` for supplying an `Encodable` type as JSON payload in the responses body.
+
+  > To ensure your Encodable types encode deterministically the default `jsonFormattingOptions` contains the `.sortedKeys` option.
+
+* Use `StubbedResponse.json(statusCode:jsonData:)` for supplying raw JSON data in a response body.
+* Use `StubbedResponse.json(statusCode:jsonString:)` for supplying a JSON string in a response body.
+
+**Example Creating a 200 OK JSON response from an Encodable model**:
+```swift
+let encodableModel = YourModelConformingToEncodable()
+
+let response = NetworkSpy.StubbedResponse.json(200, encodableModel)
+```
+
+**Example Creating a 404 Not Found response with a JSON error body**:
+```swift
+let response = NetworkSpy.StubbedResponse.json(statusCode: 404,
+                                               jsonString: "{\"error\":\"Not found\"}")
+```
+
 ## ☕ Teapot Response (Just for Fun)
 
 `NetworkSpy`s default response is [`418 I'm a teapot`](https://en.wikipedia.org/wiki/Hyper_Text_Coffee_Pot_Control_Protocol)

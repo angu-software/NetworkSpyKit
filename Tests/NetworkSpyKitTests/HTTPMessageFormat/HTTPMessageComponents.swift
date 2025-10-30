@@ -8,17 +8,14 @@
 import Foundation
 import Testing
 
+/// https://www.rfc-editor.org/rfc/rfc9112.pdf
+///
+/// - Note: Only supports the RFC 9112 request-target origin-form (RFC 9112 §3.2.1)
 struct HTTPMessageComponents {
 
     struct StartLine {
 
-        enum RequestTargetForm {
-            case origin
-        }
-
         private let space = " "
-
-        var requestTargetForm: RequestTargetForm = .origin
 
         // request-line
         var method: String?
@@ -58,15 +55,6 @@ struct HTTPMessageComponents {
         // ✅ origin-form = absolute-path [ "?" query ]
         // ✅ absolute-path = <absolute-path, see [HTTP], Section 4.1>
         // ✅ query = <query, see [URI], Section 3.4>
-
-        // absolute-form = absolute-URI
-        // absolute-URI = <absolute-URI, see [URI], Section 4.3>
-
-        // authority-form = uri-host ":" port
-        // uri-host = <host, see [URI], Section 3.2.2>
-        // port = <port, see [URI], Section 3.2.3>
-
-        // asterisk-form = "*"
         private func requestTarget() -> String? {
             guard let url else {
                 return nil
@@ -125,19 +113,7 @@ struct HTTPMessageComponents {
         }
     }
 
-    // https://www.rfc-editor.org/rfc/rfc9112.pdf
-    // request-target = origin-form / absolute-form / authority-form / asterisk-form
-
     // request-line
-    var requestTargetForm: StartLine.RequestTargetForm {
-        get {
-            startLine.requestTargetForm
-        }
-        set {
-            startLine.requestTargetForm = newValue
-        }
-    }
-
     var method: String? {
         get {
             startLine.method
@@ -267,8 +243,6 @@ struct HTTPMessageComponentsFormattingTests {
     }
 
     // MARK: - Request Message
-
-    // must always contain Host: field
 
     // MARK: request-target: origin-form
 

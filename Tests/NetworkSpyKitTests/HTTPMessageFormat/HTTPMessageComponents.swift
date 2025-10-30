@@ -45,11 +45,13 @@ struct HTTPMessageComponents {
 
         // ✅ request-line = method SP request-target SP HTTP-version
         private func requestLine() -> String? {
-            return [methodToken(),
-                    requestTarget(),
-                    httpVersionToken()]
-                .compactMap { $0 }
-                .joined(separator: space)
+            return [
+                methodToken(),
+                requestTarget(),
+                httpVersionToken(),
+            ]
+            .compactMap { $0 }
+            .joined(separator: space)
         }
 
         // request-target = origin-form / absolute-form / authority-form / asterisk-form
@@ -88,7 +90,7 @@ struct HTTPMessageComponents {
             return [
                 httpVersionToken(),
                 statusCodeToken(),
-                statusReasonPhrase()
+                statusReasonPhrase(),
             ]
             .compactMap { $0 }
             .joined(separator: space)
@@ -203,13 +205,24 @@ struct HTTPMessageComponents {
     // ✅ field-name = <field-name, see [HTTP], Section 5.1>
     // ✅ field-value = <field-value, see [HTTP], Section 5.5>
     private func fieldLines() -> String? {
-        guard var headerFields else {
+        var fields: [String] = []
+        if let host = url?.host {
+            fields.append("Host: \(host)")
+        }
+
+        if let headerFields {
+
+            fields +=
+                headerFields
+                .map { "\($0.key): \($0.value)" }
+        }
+
+        guard fields.isEmpty == false else {
             return nil
         }
 
         return
-            headerFields
-            .map { "\($0.key): \($0.value)" }
+            fields
             .sorted()
             .joined(separator: newLine)
     }
@@ -253,22 +266,23 @@ struct HTTPMessageComponentsFormattingTests {
         #expect(components.httpMessageFormat().isEmpty)
     }
 
-    // must always contain Host: field
-
     // MARK: - Request Message
+
+    // must always contain Host: field
 
     // MARK: request-target: origin-form
 
     // / when no path specified
 
     @Test
-    func requestMessage_originForm_givenURL_itIncludesAbsolutePath() {
+    func requestMessage_originForm_givenURLWithPath_itIncludesAbsolutePathAndHost() {
         var components = HTTPMessageComponents()
         components.url = url
 
         #expect(
             components.httpMessageFormat() == """
                 /rfc/rfc9112.pdf
+                Host: www.rfc-editor.org
                 """
         )
     }
@@ -282,6 +296,7 @@ struct HTTPMessageComponentsFormattingTests {
         #expect(
             components.httpMessageFormat() == """
                 POST /rfc/rfc9112.pdf
+                Host: www.rfc-editor.org
                 """
         )
     }
@@ -296,6 +311,7 @@ struct HTTPMessageComponentsFormattingTests {
         #expect(
             components.httpMessageFormat() == """
                 POST /rfc/rfc9112.pdf HTTP/1.1
+                Host: www.rfc-editor.org
                 """
         )
     }
@@ -355,6 +371,7 @@ struct HTTPMessageComponentsFormattingTests {
                 POST /rfc/rfc9112.pdf
                 Accept-Language: en-US,en;q=0.9
                 Accept: application/json
+                Host: www.rfc-editor.org
                 User-Agent: NetworkSpyKit/1.0
                 """
         )
@@ -373,6 +390,7 @@ struct HTTPMessageComponentsFormattingTests {
                 POST /rfc/rfc9112.pdf
                 Accept-Language: en-US,en;q=0.9
                 Accept: application/json
+                Host: www.rfc-editor.org
                 User-Agent: NetworkSpyKit/1.0
 
                 { "Hello World" }

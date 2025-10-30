@@ -183,7 +183,9 @@ struct HTTPMessageComponentsFormattingTests {
     // MARK: Test Support
 
     private func format(_ components: HTTPMessageComponents) -> String {
-        return components.httpMessageFormat()
+        let formatter = HTTPMessageFormatter()
+
+        return formatter.string(from: components)
     }
 
     private func makeComponents(

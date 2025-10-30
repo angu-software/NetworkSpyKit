@@ -10,20 +10,24 @@ import Testing
 
 struct HTTPMessageFormatTests {
 
-    private let httpMessage = """
-            GET /hello/world HTTP/1.1
-            Planet: Earth
-            Receiver: Animals
-
-            "Life long and prosper!"
-            """
-
     @Test
-    func givenRequestWithURL_itBuildsBasicFormat() async throws {
+    func givenRequest_itBuildsBasicFormat() async throws {
         let request = makeRequest(string: "https://rfc-messages.com/api/whatever")
 
-        #expect(request.httpMessageFormat == """
+        #expect(request.httpMessageFormat() == """
             GET /api/whatever
+            """)
+    }
+
+    @Test
+    func givenRequest_whenSpecifyingAbsoluteForm_itIncludesHost() async throws {
+        let request = makeRequest(string: "https://rfc-messages.com/api/whatever",
+                                  headerFields: ["AnotherHeader": "AnotherHeaderValue"])
+
+        #expect(request.httpMessageFormat(absoluteForm: true) == """
+            GET /api/whatever
+            Host: rfc-messages.com
+            AnotherHeader: AnotherHeaderValue
             """)
     }
 
@@ -33,7 +37,7 @@ struct HTTPMessageFormatTests {
                                   headerFields: ["SomeHeader": "SomeHeaderValue",
                                                  "AnotherHeader": "AnotherHeaderValue"])
 
-        #expect(request.httpMessageFormat == """
+        #expect(request.httpMessageFormat() == """
             GET /api/whatever
             AnotherHeader: AnotherHeaderValue
             SomeHeader: SomeHeaderValue
@@ -56,8 +60,12 @@ struct HTTPMessageFormatTests {
 extension URLRequest {
 
     /// - Note: Header fields are sorted
-    var httpMessageFormat: String {
+    ///
+    /// - Parameters:
+    ///   - absoluteForm: Absolute-form request target (RFC 9112 §3.2.1)
+    func httpMessageFormat(absoluteForm: Bool = false) -> String {
         return [httpMessageFormatStartLine,
+                absoluteForm ? httpMessageFormatHost : nil,
                 httpMessageFormatHeaderFields]
             .compactMap { $0 }
             .joined(separator: "\n")
@@ -76,6 +84,14 @@ extension URLRequest {
 
     private var httpMessageFormatPath: String? {
         url?.path
+    }
+
+    private var httpMessageFormatHost: String? {
+        guard let host = url?.host else {
+            return nil
+        }
+
+        return "Host: \(host)"
     }
 
     private var httpMessageFormatHeaderFields: String? {

@@ -165,5 +165,3 @@ struct HTTPMessageComponents {
         .joined()
     }
 }
-
-

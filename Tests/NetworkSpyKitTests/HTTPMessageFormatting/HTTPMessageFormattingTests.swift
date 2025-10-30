@@ -31,7 +31,7 @@ struct HTTPMessageComponentsFormattingTests {
 
     @Test
     func givenNothing_itReturnsEmptyString() {
-        let components = HTTPMessageComponents()
+        let components = makeComponents()
 
         #expect(format(components).isEmpty)
     }
@@ -42,8 +42,9 @@ struct HTTPMessageComponentsFormattingTests {
 
     @Test
     func requestMessage_givenEmptyAbsolutePath_itIncludesRootPath() {
-        var components = HTTPMessageComponents()
-        components.absolutePath = ""
+        let components = makeComponents(
+            absolutePath: ""
+        )
 
         #expect(
             format(components) == """
@@ -54,8 +55,9 @@ struct HTTPMessageComponentsFormattingTests {
 
     @Test
     func requestMessage_givenAbsolutePath_itIncludesAbsolutePath() {
-        var components = HTTPMessageComponents()
-        components.absolutePath = absolutePath
+        let components = makeComponents(
+            absolutePath: absolutePath
+        )
 
         #expect(
             format(components) == """
@@ -66,9 +68,10 @@ struct HTTPMessageComponentsFormattingTests {
 
     @Test
     func givenMethod_itIncludesMethod() async throws {
-        var components = HTTPMessageComponents()
-        components.method = method
-        components.absolutePath = absolutePath
+        let components = makeComponents(
+            method: method,
+            absolutePath: absolutePath
+        )
 
         #expect(
             format(components) == """
@@ -79,10 +82,11 @@ struct HTTPMessageComponentsFormattingTests {
 
     @Test
     func givenHTTPVersion_itIncludesHTTPVersion() async throws {
-        var components = HTTPMessageComponents()
-        components.method = method
-        components.absolutePath = absolutePath
-        components.httpVersion = httpVersion
+        let components = makeComponents(
+            method: method,
+            absolutePath: absolutePath,
+            httpVersion: httpVersion
+        )
 
         #expect(
             format(components) == """
@@ -95,8 +99,9 @@ struct HTTPMessageComponentsFormattingTests {
 
     @Test
     func responseMessage_givenStatusCode_itIncludesStatusCode() {
-        var components = HTTPMessageComponents()
-        components.statusCode = statusCode
+        let components = makeComponents(
+            statusCode: statusCode
+        )
 
         #expect(
             format(components) == """
@@ -107,9 +112,10 @@ struct HTTPMessageComponentsFormattingTests {
 
     @Test
     func responseMessage_givenHttpVersion_itIncludesHTTPVersion() {
-        var components = HTTPMessageComponents()
-        components.statusCode = statusCode
-        components.httpVersion = httpVersion
+        let components = makeComponents(
+            httpVersion: httpVersion,
+            statusCode: statusCode
+        )
 
         #expect(
             format(components) == """
@@ -120,10 +126,11 @@ struct HTTPMessageComponentsFormattingTests {
 
     @Test
     func responseMessage_givenStatusReason_itIncludesStatusReason() {
-        var components = HTTPMessageComponents()
-        components.httpVersion = httpVersion
-        components.statusCode = statusCode
-        components.statusReason = statusReason
+        let components = makeComponents(
+            httpVersion: httpVersion,
+            statusCode: statusCode,
+            statusReason: statusReason
+        )
 
         #expect(
             format(components) == """
@@ -136,10 +143,11 @@ struct HTTPMessageComponentsFormattingTests {
 
     @Test
     func givenHeaderFields_itIncludesFieldLines() {
-        var components = HTTPMessageComponents()
-        components.method = method
-        components.absolutePath = absolutePath
-        components.headerFields = headerFields
+        let components = makeComponents(
+            method: method,
+            absolutePath: absolutePath,
+            headerFields: headerFields
+        )
 
         #expect(
             format(components) == """
@@ -153,11 +161,12 @@ struct HTTPMessageComponentsFormattingTests {
 
     @Test
     func givenBody_itIncludesMessageBody() {
-        var components = HTTPMessageComponents()
-        components.method = method
-        components.absolutePath = absolutePath
-        components.headerFields = headerFields
-        components.body = body
+        let components = makeComponents(
+            method: method,
+            absolutePath: absolutePath,
+            headerFields: headerFields,
+            body: body
+        )
 
         #expect(
             format(components) == #"""
@@ -175,5 +184,26 @@ struct HTTPMessageComponentsFormattingTests {
 
     private func format(_ components: HTTPMessageComponents) -> String {
         return components.httpMessageFormat()
+    }
+
+    private func makeComponents(
+        method: String? = nil,
+        absolutePath: String? = nil,
+        httpVersion: String? = nil,
+        statusCode: Int? = nil,
+        statusReason: String? = nil,
+        headerFields: [String: String]? = nil,
+        body: Data? = nil
+    ) -> HTTPMessageComponents {
+        var components = HTTPMessageComponents()
+        components.method = method
+        components.absolutePath = absolutePath
+        components.httpVersion = httpVersion
+        components.statusCode = statusCode
+        components.statusReason = statusReason
+        components.headerFields = headerFields
+        components.body = body
+
+        return components
     }
 }

@@ -63,6 +63,10 @@ struct HTTPMessageFormatter {
     private let newLine = "\n"
     private var startLine = HTTPMessageComponents.StartLine()
 
+    func string(from components: HTTPMessageComponents) -> String {
+        return components.httpMessageFormat()
+    }
+
     // TODO: rename to string(from:)
     // ✅ HTTP-message = start-line CRLF *( field-line CRLF ) CRLF [ message-body ]
     func httpMessageFormat() -> String {

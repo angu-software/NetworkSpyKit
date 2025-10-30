@@ -72,7 +72,7 @@ struct HTTPMessageComponents {
                 return nil
             }
 
-            return url.path
+            return url.path.isEmpty ? "/" : url.path
         }
 
         // method = token
@@ -272,7 +272,18 @@ struct HTTPMessageComponentsFormattingTests {
 
     // MARK: request-target: origin-form
 
-    // / when no path specified
+    @Test
+    func requestMessage_originForm_givenURLWithoutPath_itIncludesRootPath() {
+        var components = HTTPMessageComponents()
+        components.url = URL(string: "https://www.rfc-editor.org")
+
+        #expect(
+            components.httpMessageFormat() == """
+                /
+                Host: www.rfc-editor.org
+                """
+        )
+    }
 
     @Test
     func requestMessage_originForm_givenURLWithPath_itIncludesAbsolutePathAndHost() {

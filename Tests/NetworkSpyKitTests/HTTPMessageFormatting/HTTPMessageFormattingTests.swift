@@ -1,5 +1,5 @@
 //
-//  HTTPMessageComponents.swift
+//  HTTPMessageFormattingTests.swift
 //  NetworkSpyKit
 //
 //  Created by Andreas Günther on 30.10.25.

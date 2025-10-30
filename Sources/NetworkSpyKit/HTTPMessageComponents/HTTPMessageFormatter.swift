@@ -9,81 +9,33 @@ import Foundation
 
 struct HTTPMessageFormatter {
 
-    // request-line
-    var method: String? {
-        get {
-            startLine.method
-        }
-        set {
-            startLine.method = newValue
-        }
-    }
-
-    var absolutePath: String? {
-        get {
-            startLine.absolutePath
-        }
-
-        set {
-            startLine.absolutePath = newValue
-        }
-    }
-
-    // status-line
-    var statusCode: Int? {
-        get {
-            startLine.statusCode
-        }
-        set {
-            startLine.statusCode = newValue
-        }
-    }
-
-    var statusReason: String? {
-        get {
-            startLine.statusReason
-        }
-        set {
-            startLine.statusReason = newValue
-        }
-    }
-
-    var httpVersion: String? {
-        get {
-            startLine.httpVersion
-        }
-        set {
-            startLine.httpVersion = newValue
-        }
-    }
-
-    var headerFields: [String: String]?
-    var body: Data?
-
     private let newLine = "\n"
     private var startLine = HTTPMessageComponents.StartLine()
 
     func string(from components: HTTPMessageComponents) -> String {
-        return components.httpMessageFormat()
+        return makeHTTPMessageFormat(components: components)
     }
 
-    // TODO: rename to string(from:)
     // ✅ HTTP-message = start-line CRLF *( field-line CRLF ) CRLF [ message-body ]
-    func httpMessageFormat() -> String {
+    func makeHTTPMessageFormat(components: HTTPMessageComponents) -> String {
         return [
-            startLine.format(),
-            fieldLines(),
-            messageBody(),
+            makeStartLine(components: components),
+            makeFieldLines(components: components),
+            makeMessageBody(components: components),
         ]
         .compactMap { $0 }
         .joined(separator: newLine)
     }
 
+    private func makeStartLine(components: HTTPMessageComponents) -> String? {
+        return components.startLine.format()
+    }
+
     // ✅ field-line = field-name ":" OWS field-value OWS
     // ✅ field-name = <field-name, see [HTTP], Section 5.1>
     // ✅ field-value = <field-value, see [HTTP], Section 5.5>
-    private func fieldLines() -> String? {
-        guard let headerFields,
+    private func makeFieldLines(components: HTTPMessageComponents) -> String? {
+        guard let headerFields = components.headerFields,
             headerFields.isEmpty == false
         else {
             return nil
@@ -97,8 +49,8 @@ struct HTTPMessageFormatter {
     }
 
     // ✅ message-body = *OCTET
-    private func messageBody() -> String? {
-        guard let body,
+    private func makeMessageBody(components: HTTPMessageComponents) -> String? {
+        guard let body = components.body,
             let bodyString = String(data: body, encoding: .utf8)
         else {
             return nil

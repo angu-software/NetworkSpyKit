@@ -27,6 +27,7 @@ struct HTTPMessageComponents {
     var headerFields: [String: String]?
     var body: Data?
 
+    private let space = " "
     private let newLine = "\n"
 
     func httpMessageFormat() -> String {
@@ -47,7 +48,18 @@ struct HTTPMessageComponents {
 
     private func requestLine() -> String? {
         // request-line = method SP request-target SP HTTP-version
-        return requestTarget()
+        return [methodToken(),
+                requestTarget()]
+            .compactMap { $0 }
+            .joined(separator: space)
+    }
+
+    private func methodToken() -> String? {
+        guard let method else {
+            return nil
+        }
+
+        return method.uppercased()
     }
 
     private func requestTarget() -> String? {
@@ -93,6 +105,7 @@ struct HTTPMessageComponents {
 
 struct HTTPMessageComponentsFormattingTests {
 
+    private let method = "PosT"
     private let url = URL(string: "https://www.rfc-editor.org/rfc/rfc9112.pdf")
     private let headerFields = [
         "User-Agent": "NetworkSpyKit/1.0",
@@ -126,14 +139,30 @@ struct HTTPMessageComponentsFormattingTests {
     }
 
     @Test
+    func givenMethod_itIncludesMethod() async throws {
+        var components = HTTPMessageComponents()
+        components.method = method
+        components.url = url
+
+        #expect(
+            components.httpMessageFormat() == """
+                POST /rfc/rfc9112.pdf
+                """
+        )
+    }
+
+    // MARK: - Message type agnostic
+
+    @Test
     func givenHeaderFields_itIncludesFieldLines() {
         var components = HTTPMessageComponents()
+        components.method = method
         components.url = url
         components.headerFields = headerFields
 
         #expect(
             components.httpMessageFormat() == """
-                /rfc/rfc9112.pdf
+                POST /rfc/rfc9112.pdf
                 Accept-Language: en-US,en;q=0.9
                 Accept: application/json
                 User-Agent: NetworkSpyKit/1.0
@@ -144,13 +173,14 @@ struct HTTPMessageComponentsFormattingTests {
     @Test
     func givenBody_itIncludesMessageBody() {
         var components = HTTPMessageComponents()
+        components.method = method
         components.url = url
         components.headerFields = headerFields
         components.body = body
 
         #expect(
             components.httpMessageFormat() == #"""
-                /rfc/rfc9112.pdf
+                POST /rfc/rfc9112.pdf
                 Accept-Language: en-US,en;q=0.9
                 Accept: application/json
                 User-Agent: NetworkSpyKit/1.0

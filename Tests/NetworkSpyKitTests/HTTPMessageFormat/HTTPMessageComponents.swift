@@ -13,31 +13,41 @@ struct HTTPMessageComponents {
     // https://www.rfc-editor.org/rfc/rfc9112.pdf
     // HTTP-message = HTTP-message = start-line CRLF *( field-line CRLF ) CRLF [ message-body ]
 
-    // start-line = request-line / status-line
-    // request-line = method SP request-target SP HTTP-version
     // method = token
     // request-target = origin-form / absolute-form / authority-form / asterisk-form
     // HTTP-version = HTTP-name "/" DIGIT "." DIGIT
     // HTTP-name = %x48.54.54.50 ; HTTP
 
-    // field-line = field-name ":" OWS field-value OWS
-    // field-name = <field-name, see [HTTP], Section 5.1>
-    // field-value = <field-value, see [HTTP], Section 5.5>
-
     // message-body = *OCTET
 
+    // request specific
+    var method: String?
     var url: URL?
+
     var headerFields: [String: String]?
+    var body: Data?
 
     private let newLine = "\n"
 
     func httpMessageFormat() -> String {
+        // HTTP-message = HTTP-message = start-line CRLF *( field-line CRLF ) CRLF [ message-body ]
         return [
-            requestTarget(),
+            startLine(),
             fieldLines(),
+            messageBody()
         ]
         .compactMap { $0 }
         .joined(separator: newLine)
+    }
+
+    private func startLine() -> String? {
+        // start-line = request-line / status-line
+        return requestLine()
+    }
+
+    private func requestLine() -> String? {
+        // request-line = method SP request-target SP HTTP-version
+        return requestTarget()
     }
 
     private func requestTarget() -> String? {
@@ -53,6 +63,9 @@ struct HTTPMessageComponents {
     }
 
     private func fieldLines() -> String? {
+        // ✅ field-line = field-name ":" OWS field-value OWS
+        // ✅ field-name = <field-name, see [HTTP], Section 5.1>
+        // ✅ field-value = <field-value, see [HTTP], Section 5.5>
         guard let headerFields,
             headerFields.isEmpty == false
         else {
@@ -65,6 +78,17 @@ struct HTTPMessageComponents {
             .sorted()
             .joined(separator: newLine)
     }
+
+    private func messageBody() -> String? {
+        guard let body,
+              let bodyString = String(data: body, encoding: .utf8) else {
+            return nil
+        }
+
+        return [newLine,
+                bodyString]
+            .joined()
+    }
 }
 
 struct HTTPMessageComponentsFormattingTests {
@@ -75,6 +99,7 @@ struct HTTPMessageComponentsFormattingTests {
         "Accept": "application/json",
         "Accept-Language": "en-US,en;q=0.9",
     ]
+    private let body: Data? = #"{ "Hello World" }"#.data(using: .utf8)
 
     @Test
     func givenNothing_itReturnsEmptyString() {
@@ -82,6 +107,9 @@ struct HTTPMessageComponentsFormattingTests {
 
         #expect(components.httpMessageFormat().isEmpty)
     }
+
+    // MARK: - Request Message
+
 
     // MARK: request-target: origin-form
 
@@ -110,6 +138,25 @@ struct HTTPMessageComponentsFormattingTests {
                 Accept: application/json
                 User-Agent: NetworkSpyKit/1.0
                 """
+        )
+    }
+
+    @Test
+    func givenBody_itIncludesMessageBody() {
+        var components = HTTPMessageComponents()
+        components.url = url
+        components.headerFields = headerFields
+        components.body = body
+
+        #expect(
+            components.httpMessageFormat() == #"""
+                /rfc/rfc9112.pdf
+                Accept-Language: en-US,en;q=0.9
+                Accept: application/json
+                User-Agent: NetworkSpyKit/1.0
+                
+                { "Hello World" }
+                """#
         )
     }
 }

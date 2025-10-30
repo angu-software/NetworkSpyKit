@@ -23,6 +23,7 @@ struct HTTPMessageComponents {
     // request specific
     var method: String?
     var url: URL?
+    var httpVersion: String?
 
     var headerFields: [String: String]?
     var body: Data?
@@ -49,7 +50,8 @@ struct HTTPMessageComponents {
     private func requestLine() -> String? {
         // request-line = method SP request-target SP HTTP-version
         return [methodToken(),
-                requestTarget()]
+                requestTarget(),
+                httpVersionToken()]
             .compactMap { $0 }
             .joined(separator: space)
     }
@@ -60,6 +62,14 @@ struct HTTPMessageComponents {
         }
 
         return method.uppercased()
+    }
+
+    private func httpVersionToken() -> String? {
+        guard let httpVersion else {
+            return nil
+        }
+
+        return httpVersion
     }
 
     private func requestTarget() -> String? {
@@ -105,6 +115,7 @@ struct HTTPMessageComponents {
 
 struct HTTPMessageComponentsFormattingTests {
 
+    private let httpVersion = "HTTP/1.1"
     private let method = "PosT"
     private let url = URL(string: "https://www.rfc-editor.org/rfc/rfc9112.pdf")
     private let headerFields = [
@@ -147,6 +158,20 @@ struct HTTPMessageComponentsFormattingTests {
         #expect(
             components.httpMessageFormat() == """
                 POST /rfc/rfc9112.pdf
+                """
+        )
+    }
+
+    @Test
+    func givenHTTPVersion_itIncludesHTTPVersion() async throws {
+        var components = HTTPMessageComponents()
+        components.method = method
+        components.url = url
+        components.httpVersion = httpVersion
+
+        #expect(
+            components.httpMessageFormat() == """
+                POST /rfc/rfc9112.pdf HTTP/1.1
                 """
         )
     }

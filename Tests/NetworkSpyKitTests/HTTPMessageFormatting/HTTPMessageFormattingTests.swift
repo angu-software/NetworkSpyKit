@@ -10,11 +10,14 @@ import Testing
 
 @testable import NetworkSpyKit
 
+// TODO: formatter for convenient creation of components
+// ensures the header and target format are set correctly
+
 struct HTTPMessageComponentsFormattingTests {
 
     private let httpVersion = "HTTP/1.1"
     private let method = "PosT"
-    private let url = URL(string: "https://www.rfc-editor.org/rfc/rfc9112.pdf")
+    private let absolutePath = "/rfc/rfc9112.pdf"
 
     private let statusCode = 404
     private let statusReason = "NOT FOUND"
@@ -38,27 +41,25 @@ struct HTTPMessageComponentsFormattingTests {
     // MARK: request-target: origin-form
 
     @Test
-    func requestMessage_originForm_givenURLWithoutPath_itIncludesRootPath() {
+    func requestMessage_givenEmptyAbsolutePath_itIncludesRootPath() {
         var components = HTTPMessageComponents()
-        components.url = URL(string: "https://www.rfc-editor.org")
+        components.absolutePath = ""
 
         #expect(
             components.httpMessageFormat() == """
                 /
-                Host: www.rfc-editor.org
                 """
         )
     }
 
     @Test
-    func requestMessage_originForm_givenURLWithPath_itIncludesAbsolutePathAndHost() {
+    func requestMessage_givenAbsolutePath_itIncludesAbsolutePath() {
         var components = HTTPMessageComponents()
-        components.url = url
+        components.absolutePath = absolutePath
 
         #expect(
             components.httpMessageFormat() == """
                 /rfc/rfc9112.pdf
-                Host: www.rfc-editor.org
                 """
         )
     }
@@ -67,12 +68,11 @@ struct HTTPMessageComponentsFormattingTests {
     func givenMethod_itIncludesMethod() async throws {
         var components = HTTPMessageComponents()
         components.method = method
-        components.url = url
+        components.absolutePath = absolutePath
 
         #expect(
             components.httpMessageFormat() == """
                 POST /rfc/rfc9112.pdf
-                Host: www.rfc-editor.org
                 """
         )
     }
@@ -81,13 +81,12 @@ struct HTTPMessageComponentsFormattingTests {
     func givenHTTPVersion_itIncludesHTTPVersion() async throws {
         var components = HTTPMessageComponents()
         components.method = method
-        components.url = url
+        components.absolutePath = absolutePath
         components.httpVersion = httpVersion
 
         #expect(
             components.httpMessageFormat() == """
                 POST /rfc/rfc9112.pdf HTTP/1.1
-                Host: www.rfc-editor.org
                 """
         )
     }
@@ -139,7 +138,7 @@ struct HTTPMessageComponentsFormattingTests {
     func givenHeaderFields_itIncludesFieldLines() {
         var components = HTTPMessageComponents()
         components.method = method
-        components.url = url
+        components.absolutePath = absolutePath
         components.headerFields = headerFields
 
         #expect(
@@ -147,7 +146,6 @@ struct HTTPMessageComponentsFormattingTests {
                 POST /rfc/rfc9112.pdf
                 Accept-Language: en-US,en;q=0.9
                 Accept: application/json
-                Host: www.rfc-editor.org
                 User-Agent: NetworkSpyKit/1.0
                 """
         )
@@ -157,7 +155,7 @@ struct HTTPMessageComponentsFormattingTests {
     func givenBody_itIncludesMessageBody() {
         var components = HTTPMessageComponents()
         components.method = method
-        components.url = url
+        components.absolutePath = absolutePath
         components.headerFields = headerFields
         components.body = body
 
@@ -166,7 +164,6 @@ struct HTTPMessageComponentsFormattingTests {
                 POST /rfc/rfc9112.pdf
                 Accept-Language: en-US,en;q=0.9
                 Accept: application/json
-                Host: www.rfc-editor.org
                 User-Agent: NetworkSpyKit/1.0
 
                 { "Hello World" }

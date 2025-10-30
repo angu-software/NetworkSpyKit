@@ -8,13 +8,13 @@
 import Foundation
 
 extension HTTPMessageComponents {
-    struct StartLine {
 
+    struct StartLine {
         private let space = " "
 
         // request-line
         var method: String?
-        var url: URL?
+        var absolutePath: String?
 
         // status-line
         var statusCode: Int?
@@ -51,11 +51,11 @@ extension HTTPMessageComponents {
         // ✅ absolute-path = <absolute-path, see [HTTP], Section 4.1>
         // ✅ query = <query, see [URI], Section 3.4>
         private func requestTarget() -> String? {
-            guard let url else {
+            guard let absolutePath else {
                 return nil
             }
 
-            return url.path.isEmpty ? "/" : url.path
+            return absolutePath.isEmpty ? "/" : absolutePath
         }
 
         // method = token

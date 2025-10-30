@@ -78,12 +78,13 @@ struct HTTPMessageComponents {
         }
     }
 
-    var url: URL? {
+    var absolutePath: String? {
         get {
-            startLine.url
+            startLine.absolutePath
         }
+
         set {
-            startLine.url = newValue
+            startLine.absolutePath = newValue
         }
     }
 
@@ -136,24 +137,15 @@ struct HTTPMessageComponents {
     // ✅ field-name = <field-name, see [HTTP], Section 5.1>
     // ✅ field-value = <field-value, see [HTTP], Section 5.5>
     private func fieldLines() -> String? {
-        var fields: [String] = []
-        if let host = url?.host {
-            fields.append("Host: \(host)")
-        }
-
-        if let headerFields {
-
-            fields +=
-                headerFields
-                .map { "\($0.key): \($0.value)" }
-        }
-
-        guard fields.isEmpty == false else {
+        guard let headerFields,
+            headerFields.isEmpty == false
+        else {
             return nil
         }
 
         return
-            fields
+            headerFields
+            .map { "\($0.key): \($0.value)" }
             .sorted()
             .joined(separator: newLine)
     }

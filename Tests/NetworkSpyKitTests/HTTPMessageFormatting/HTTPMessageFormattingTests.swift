@@ -33,7 +33,7 @@ struct HTTPMessageComponentsFormattingTests {
     func givenNothing_itReturnsEmptyString() {
         let components = HTTPMessageComponents()
 
-        #expect(components.httpMessageFormat().isEmpty)
+        #expect(format(components).isEmpty)
     }
 
     // MARK: - Request Message
@@ -46,7 +46,7 @@ struct HTTPMessageComponentsFormattingTests {
         components.absolutePath = ""
 
         #expect(
-            components.httpMessageFormat() == """
+            format(components) == """
                 /
                 """
         )
@@ -58,7 +58,7 @@ struct HTTPMessageComponentsFormattingTests {
         components.absolutePath = absolutePath
 
         #expect(
-            components.httpMessageFormat() == """
+            format(components) == """
                 /rfc/rfc9112.pdf
                 """
         )
@@ -71,7 +71,7 @@ struct HTTPMessageComponentsFormattingTests {
         components.absolutePath = absolutePath
 
         #expect(
-            components.httpMessageFormat() == """
+            format(components) == """
                 POST /rfc/rfc9112.pdf
                 """
         )
@@ -85,7 +85,7 @@ struct HTTPMessageComponentsFormattingTests {
         components.httpVersion = httpVersion
 
         #expect(
-            components.httpMessageFormat() == """
+            format(components) == """
                 POST /rfc/rfc9112.pdf HTTP/1.1
                 """
         )
@@ -99,7 +99,7 @@ struct HTTPMessageComponentsFormattingTests {
         components.statusCode = statusCode
 
         #expect(
-            components.httpMessageFormat() == """
+            format(components) == """
                 404
                 """
         )
@@ -112,7 +112,7 @@ struct HTTPMessageComponentsFormattingTests {
         components.httpVersion = httpVersion
 
         #expect(
-            components.httpMessageFormat() == """
+            format(components) == """
                 HTTP/1.1 404
                 """
         )
@@ -126,7 +126,7 @@ struct HTTPMessageComponentsFormattingTests {
         components.statusReason = statusReason
 
         #expect(
-            components.httpMessageFormat() == """
+            format(components) == """
                 HTTP/1.1 404 NOT FOUND
                 """
         )
@@ -142,7 +142,7 @@ struct HTTPMessageComponentsFormattingTests {
         components.headerFields = headerFields
 
         #expect(
-            components.httpMessageFormat() == """
+            format(components) == """
                 POST /rfc/rfc9112.pdf
                 Accept-Language: en-US,en;q=0.9
                 Accept: application/json
@@ -160,7 +160,7 @@ struct HTTPMessageComponentsFormattingTests {
         components.body = body
 
         #expect(
-            components.httpMessageFormat() == #"""
+            format(components) == #"""
                 POST /rfc/rfc9112.pdf
                 Accept-Language: en-US,en;q=0.9
                 Accept: application/json
@@ -169,5 +169,11 @@ struct HTTPMessageComponentsFormattingTests {
                 { "Hello World" }
                 """#
         )
+    }
+
+    // MARK: Test Support
+
+    private func format(_ components: HTTPMessageComponents) -> String {
+        return components.httpMessageFormat()
     }
 }

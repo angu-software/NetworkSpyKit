@@ -5,6 +5,8 @@
 //  Created by Andreas Günther on 30.10.25.
 //
 
+import Foundation
+
 struct HTTPMessageComponents {
 
     // https://www.rfc-editor.org/rfc/rfc9112.pdf
@@ -27,8 +29,14 @@ struct HTTPMessageComponents {
     // absolute-path = <absolute-path, see [HTTP], Section 4.1>
     // query = <query, see [URI], Section 3.4>
 
+    var url: URL?
+
     func httpMessageFormat() -> String {
-        return ""
+        guard let url else {
+            return ""
+        }
+
+        return url.path
     }
 }
 
@@ -36,10 +44,20 @@ import Testing
 
 struct HTTPMessageComponentsTests {
 
+    private let url = URL(string: "https://www.rfc-editor.org/rfc/rfc9112.pdf")
+
     @Test
     func givenNothing_itBuildsEmptyString() {
         let components = HTTPMessageComponents()
 
         #expect(components.httpMessageFormat().isEmpty)
+    }
+
+    @Test
+    func givenURL_itContainsAbsolutePath() {
+        var components = HTTPMessageComponents()
+        components.url = url
+
+        #expect(components.httpMessageFormat() == "/rfc/rfc9112.pdf")
     }
 }

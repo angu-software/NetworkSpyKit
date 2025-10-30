@@ -12,24 +12,39 @@ struct HTTPMessageComponents {
 
     struct StartLine {
 
+        enum RequestTargetForm {
+            case origin
+        }
+
         private let space = " "
 
+        var requestTargetForm: RequestTargetForm = .origin
+
+        // request-line
         var method: String?
         var url: URL?
-        var httpVersion: String?
 
         // status-line
-        // httpVersion
-        // statusCode
-        // reasonMessage
+        var statusCode: Int?
+        var statusReason: String?
 
+        var httpVersion: String?
+
+        var isStatusLine: Bool {
+            return statusCode != nil
+        }
+
+        // ✅ start-line = request-line / status-line
         func format() -> String? {
-            // start-line = ✅ request-line / status-line
+            if isStatusLine {
+                return statusLine()
+            }
+
             return requestLine()
         }
 
+        // ✅ request-line = method SP request-target SP HTTP-version
         private func requestLine() -> String? {
-            // ✅ request-line = method SP request-target SP HTTP-version
             return [methodToken(),
                     requestTarget(),
                     httpVersionToken()]
@@ -37,11 +52,20 @@ struct HTTPMessageComponents {
                 .joined(separator: space)
         }
 
+        // request-target = origin-form / absolute-form / authority-form / asterisk-form
+        // ✅ origin-form = absolute-path [ "?" query ]
+        // ✅ absolute-path = <absolute-path, see [HTTP], Section 4.1>
+        // ✅ query = <query, see [URI], Section 3.4>
+
+        // absolute-form = absolute-URI
+        // absolute-URI = <absolute-URI, see [URI], Section 4.3>
+
+        // authority-form = uri-host ":" port
+        // uri-host = <host, see [URI], Section 3.2.2>
+        // port = <port, see [URI], Section 3.2.3>
+
+        // asterisk-form = "*"
         private func requestTarget() -> String? {
-            // request-target = origin-form / absolute-form / authority-form / asterisk-form
-            // origin-form = absolute-path [ "?" query ]
-            // ✅ absolute-path = <absolute-path, see [HTTP], Section 4.1>
-            // query = <query, see [URI], Section 3.4>
             guard let url else {
                 return nil
             }
@@ -49,7 +73,9 @@ struct HTTPMessageComponents {
             return url.path
         }
 
+        // method = token
         private func methodToken() -> String? {
+
             guard let method else {
                 return nil
             }
@@ -57,11 +83,37 @@ struct HTTPMessageComponents {
             return method.uppercased()
         }
 
+        // status-line = HTTP-version SP status-code SP [ reason-phrase ]
         private func statusLine() -> String? {
-            //status-line = HTTP-version SP status-code SP [ reason-phrase ]
-            return nil
+            return [
+                httpVersionToken(),
+                statusCodeToken(),
+                statusReasonPhrase()
+            ]
+            .compactMap { $0 }
+            .joined(separator: space)
         }
 
+        // status-code = 3DIGIT
+        private func statusCodeToken() -> String? {
+            guard let statusCode else {
+                return nil
+            }
+
+            return "\(statusCode)"
+        }
+
+        // reason-phrase = 1*( HTAB / SP / VCHAR / obs-text )
+        private func statusReasonPhrase() -> String? {
+            guard let statusReason else {
+                return nil
+            }
+
+            return statusReason
+        }
+
+        // HTTP-version = HTTP-name "/" DIGIT "." DIGIT
+        // HTTP-name = %x48.54.54.50 ; HTTP
         private func httpVersionToken() -> String? {
             guard let httpVersion else {
                 return nil
@@ -72,16 +124,18 @@ struct HTTPMessageComponents {
     }
 
     // https://www.rfc-editor.org/rfc/rfc9112.pdf
-    // HTTP-message = HTTP-message = start-line CRLF *( field-line CRLF ) CRLF [ message-body ]
-
-    // method = token
     // request-target = origin-form / absolute-form / authority-form / asterisk-form
-    // HTTP-version = HTTP-name "/" DIGIT "." DIGIT
-    // HTTP-name = %x48.54.54.50 ; HTTP
-
-    // message-body = *OCTET
 
     // request-line
+    var requestTargetForm: StartLine.RequestTargetForm {
+        get {
+            startLine.requestTargetForm
+        }
+        set {
+            startLine.requestTargetForm = newValue
+        }
+    }
+
     var method: String? {
         get {
             startLine.method
@@ -100,6 +154,25 @@ struct HTTPMessageComponents {
         }
     }
 
+    // status-line
+    var statusCode: Int? {
+        get {
+            startLine.statusCode
+        }
+        set {
+            startLine.statusCode = newValue
+        }
+    }
+
+    var statusReason: String? {
+        get {
+            startLine.statusReason
+        }
+        set {
+            startLine.statusReason = newValue
+        }
+    }
+
     var httpVersion: String? {
         get {
             startLine.httpVersion
@@ -115,24 +188,22 @@ struct HTTPMessageComponents {
     private let newLine = "\n"
     private var startLine = StartLine()
 
+    // ✅ HTTP-message = start-line CRLF *( field-line CRLF ) CRLF [ message-body ]
     func httpMessageFormat() -> String {
-        // HTTP-message = HTTP-message = start-line CRLF *( field-line CRLF ) CRLF [ message-body ]
         return [
             startLine.format(),
             fieldLines(),
-            messageBody()
+            messageBody(),
         ]
         .compactMap { $0 }
         .joined(separator: newLine)
     }
 
+    // ✅ field-line = field-name ":" OWS field-value OWS
+    // ✅ field-name = <field-name, see [HTTP], Section 5.1>
+    // ✅ field-value = <field-value, see [HTTP], Section 5.5>
     private func fieldLines() -> String? {
-        // ✅ field-line = field-name ":" OWS field-value OWS
-        // ✅ field-name = <field-name, see [HTTP], Section 5.1>
-        // ✅ field-value = <field-value, see [HTTP], Section 5.5>
-        guard let headerFields,
-            headerFields.isEmpty == false
-        else {
+        guard var headerFields else {
             return nil
         }
 
@@ -143,15 +214,19 @@ struct HTTPMessageComponents {
             .joined(separator: newLine)
     }
 
+    // ✅ message-body = *OCTET
     private func messageBody() -> String? {
         guard let body,
-              let bodyString = String(data: body, encoding: .utf8) else {
+            let bodyString = String(data: body, encoding: .utf8)
+        else {
             return nil
         }
 
-        return [newLine,
-                bodyString]
-            .joined()
+        return [
+            newLine,
+            bodyString,
+        ]
+        .joined()
     }
 }
 
@@ -160,6 +235,10 @@ struct HTTPMessageComponentsFormattingTests {
     private let httpVersion = "HTTP/1.1"
     private let method = "PosT"
     private let url = URL(string: "https://www.rfc-editor.org/rfc/rfc9112.pdf")
+
+    private let statusCode = 404
+    private let statusReason = "NOT FOUND"
+
     private let headerFields = [
         "User-Agent": "NetworkSpyKit/1.0",
         "Accept": "application/json",
@@ -174,13 +253,16 @@ struct HTTPMessageComponentsFormattingTests {
         #expect(components.httpMessageFormat().isEmpty)
     }
 
-    // MARK: - Request Message
+    // must always contain Host: field
 
+    // MARK: - Request Message
 
     // MARK: request-target: origin-form
 
+    // / when no path specified
+
     @Test
-    func givenURL_itIncludesAbsolutePath() {
+    func requestMessage_originForm_givenURL_itIncludesAbsolutePath() {
         var components = HTTPMessageComponents()
         components.url = url
 
@@ -218,6 +300,47 @@ struct HTTPMessageComponentsFormattingTests {
         )
     }
 
+    // MARK: - Response Message
+
+    @Test
+    func responseMessage_givenStatusCode_itIncludesStatusCode() {
+        var components = HTTPMessageComponents()
+        components.statusCode = statusCode
+
+        #expect(
+            components.httpMessageFormat() == """
+                404
+                """
+        )
+    }
+
+    @Test
+    func responseMessage_givenHttpVersion_itIncludesHTTPVersion() {
+        var components = HTTPMessageComponents()
+        components.statusCode = statusCode
+        components.httpVersion = httpVersion
+
+        #expect(
+            components.httpMessageFormat() == """
+                HTTP/1.1 404
+                """
+        )
+    }
+
+    @Test
+    func responseMessage_givenStatusReason_itIncludesStatusReason() {
+        var components = HTTPMessageComponents()
+        components.httpVersion = httpVersion
+        components.statusCode = statusCode
+        components.statusReason = statusReason
+
+        #expect(
+            components.httpMessageFormat() == """
+                HTTP/1.1 404 NOT FOUND
+                """
+        )
+    }
+
     // MARK: - Message type agnostic
 
     @Test
@@ -251,7 +374,7 @@ struct HTTPMessageComponentsFormattingTests {
                 Accept-Language: en-US,en;q=0.9
                 Accept: application/json
                 User-Agent: NetworkSpyKit/1.0
-                
+
                 { "Hello World" }
                 """#
         )

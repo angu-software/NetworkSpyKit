@@ -10,6 +10,67 @@ import Testing
 
 struct HTTPMessageComponents {
 
+    struct StartLine {
+
+        private let space = " "
+
+        var method: String?
+        var url: URL?
+        var httpVersion: String?
+
+        // status-line
+        // httpVersion
+        // statusCode
+        // reasonMessage
+
+        func format() -> String? {
+            // start-line = ✅ request-line / status-line
+            return requestLine()
+        }
+
+        private func requestLine() -> String? {
+            // ✅ request-line = method SP request-target SP HTTP-version
+            return [methodToken(),
+                    requestTarget(),
+                    httpVersionToken()]
+                .compactMap { $0 }
+                .joined(separator: space)
+        }
+
+        private func requestTarget() -> String? {
+            // request-target = origin-form / absolute-form / authority-form / asterisk-form
+            // origin-form = absolute-path [ "?" query ]
+            // ✅ absolute-path = <absolute-path, see [HTTP], Section 4.1>
+            // query = <query, see [URI], Section 3.4>
+            guard let url else {
+                return nil
+            }
+
+            return url.path
+        }
+
+        private func methodToken() -> String? {
+            guard let method else {
+                return nil
+            }
+
+            return method.uppercased()
+        }
+
+        private func statusLine() -> String? {
+            //status-line = HTTP-version SP status-code SP [ reason-phrase ]
+            return nil
+        }
+
+        private func httpVersionToken() -> String? {
+            guard let httpVersion else {
+                return nil
+            }
+
+            return httpVersion
+        }
+    }
+
     // https://www.rfc-editor.org/rfc/rfc9112.pdf
     // HTTP-message = HTTP-message = start-line CRLF *( field-line CRLF ) CRLF [ message-body ]
 
@@ -20,68 +81,49 @@ struct HTTPMessageComponents {
 
     // message-body = *OCTET
 
-    // request specific
-    var method: String?
-    var url: URL?
-    var httpVersion: String?
+    // request-line
+    var method: String? {
+        get {
+            startLine.method
+        }
+        set {
+            startLine.method = newValue
+        }
+    }
+
+    var url: URL? {
+        get {
+            startLine.url
+        }
+        set {
+            startLine.url = newValue
+        }
+    }
+
+    var httpVersion: String? {
+        get {
+            startLine.httpVersion
+        }
+        set {
+            startLine.httpVersion = newValue
+        }
+    }
 
     var headerFields: [String: String]?
     var body: Data?
 
-    private let space = " "
     private let newLine = "\n"
+    private var startLine = StartLine()
 
     func httpMessageFormat() -> String {
         // HTTP-message = HTTP-message = start-line CRLF *( field-line CRLF ) CRLF [ message-body ]
         return [
-            startLine(),
+            startLine.format(),
             fieldLines(),
             messageBody()
         ]
         .compactMap { $0 }
         .joined(separator: newLine)
-    }
-
-    private func startLine() -> String? {
-        // start-line = request-line / status-line
-        return requestLine()
-    }
-
-    private func requestLine() -> String? {
-        // request-line = method SP request-target SP HTTP-version
-        return [methodToken(),
-                requestTarget(),
-                httpVersionToken()]
-            .compactMap { $0 }
-            .joined(separator: space)
-    }
-
-    private func methodToken() -> String? {
-        guard let method else {
-            return nil
-        }
-
-        return method.uppercased()
-    }
-
-    private func httpVersionToken() -> String? {
-        guard let httpVersion else {
-            return nil
-        }
-
-        return httpVersion
-    }
-
-    private func requestTarget() -> String? {
-        // request-target = origin-form / absolute-form / authority-form / asterisk-form
-        // origin-form = absolute-path [ "?" query ]
-        // ✅ absolute-path = <absolute-path, see [HTTP], Section 4.1>
-        // query = <query, see [URI], Section 3.4>
-        guard let url else {
-            return nil
-        }
-
-        return url.path
     }
 
     private func fieldLines() -> String? {

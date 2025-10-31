@@ -10,77 +10,11 @@ import Testing
 
 @testable import NetworkSpyKit
 
-// TODO: formatter for convenient creation of components
-// ensures the header and target format are set correctly
-
 struct HTTPMessageComponentsFormattingTests {
 
-    private let httpVersion = "HTTP/1.1"
-    private let method = "PosT"
-    private let absolutePath = "/rfc/rfc9112.pdf"
-
-    private let statusCode = 404
-    private let statusReason = "NOT FOUND"
-
-    private let headerFields = [
-        "User-Agent": "NetworkSpyKit/1.0",
-        "Accept": "application/json",
-        "Accept-Language": "en-US,en;q=0.9",
-    ]
-    private let body: Data? = #"{ "Hello World" }"#.data(using: .utf8)
-
-    // MARK: - Request Message
-
-    // MARK: request-target: origin-form
-
     @Test
-    func requestMessage_itFormatsMethodAndAbsolutePath() {
-        let components = makeComponents(
-            method: "GET",
-            absolutePath: ""
-        )
-
-        #expect(
-            format(components) == """
-                GET /
-                """
-        )
-    }
-
-    @Test
-    func requestMessage_givenAbsolutePath_itIncludesAbsolutePath() {
-        let components = makeComponents(
-            absolutePath: absolutePath
-        )
-
-        #expect(
-            format(components) == """
-                GET /rfc/rfc9112.pdf
-                """
-        )
-    }
-
-    @Test
-    func givenMethod_itIncludesMethod() async throws {
-        let components = makeComponents(
-            method: method,
-            absolutePath: absolutePath
-        )
-
-        #expect(
-            format(components) == """
-                POST /rfc/rfc9112.pdf
-                """
-        )
-    }
-
-    @Test
-    func givenHTTPVersion_itIncludesHTTPVersion() async throws {
-        let components = makeComponents(
-            method: method,
-            absolutePath: absolutePath,
-            httpVersion: httpVersion
-        )
+    func givenRequestLine_itFormatsRequestMessage() {
+        let components = makeComponents()
 
         #expect(
             format(components) == """
@@ -89,26 +23,26 @@ struct HTTPMessageComponentsFormattingTests {
         )
     }
 
-    // MARK: - Response Message
-
     @Test
-    func responseMessage_givenStatusCode_itIncludesStatusCode() {
+    func givenRequestLineWithEmptyPath_itFormatsRequestMessageWithRootPath() {
         let components = makeComponents(
-            statusCode: statusCode
+            startLine: makeStartLine(
+                method: "GET",
+                absolutePath: ""
+            )
         )
 
         #expect(
             format(components) == """
-                404
+                GET / HTTP/1.1
                 """
         )
     }
 
     @Test
-    func responseMessage_givenHttpVersion_itIncludesHTTPVersion() {
+    func givenStatusLine_itFormatsStatusMessage() {
         let components = makeComponents(
-            httpVersion: httpVersion,
-            statusCode: statusCode
+            startLine: makeStartLine(statusCode: 404)
         )
 
         #expect(
@@ -119,11 +53,12 @@ struct HTTPMessageComponentsFormattingTests {
     }
 
     @Test
-    func responseMessage_givenStatusReason_itIncludesStatusReason() {
+    func givenStatusLineWithReason_itFormatsStatusMessageWithReasonPhrase() {
         let components = makeComponents(
-            httpVersion: httpVersion,
-            statusCode: statusCode,
-            statusReason: statusReason
+            startLine: makeStartLine(
+                statusCode: 404,
+                reasonPhrase: "NOT FOUND"
+            )
         )
 
         #expect(
@@ -133,19 +68,19 @@ struct HTTPMessageComponentsFormattingTests {
         )
     }
 
-    // MARK: - Message type agnostic
-
     @Test
-    func givenHeaderFields_itIncludesFieldLines() {
+    func givenHeaderFields_itFormatsIncludingFieldLines() {
         let components = makeComponents(
-            method: method,
-            absolutePath: absolutePath,
-            headerFields: headerFields
+            headerFields: [
+                "User-Agent": "NetworkSpyKit/1.0",
+                "Accept": "application/json",
+                "Accept-Language": "en-US,en;q=0.9",
+            ]
         )
 
         #expect(
             format(components) == """
-                POST /rfc/rfc9112.pdf
+                POST /rfc/rfc9112.pdf HTTP/1.1
                 Accept-Language: en-US,en;q=0.9
                 Accept: application/json
                 User-Agent: NetworkSpyKit/1.0
@@ -154,20 +89,14 @@ struct HTTPMessageComponentsFormattingTests {
     }
 
     @Test
-    func givenBody_itIncludesMessageBody() {
+    func givenBody_itFormatsIncludingMessageBody() {
         let components = makeComponents(
-            method: method,
-            absolutePath: absolutePath,
-            headerFields: headerFields,
-            body: body
+            body: #"{ "Hello World" }"#.data(using: .utf8)
         )
 
         #expect(
             format(components) == #"""
-                POST /rfc/rfc9112.pdf
-                Accept-Language: en-US,en;q=0.9
-                Accept: application/json
-                User-Agent: NetworkSpyKit/1.0
+                POST /rfc/rfc9112.pdf HTTP/1.1
 
                 { "Hello World" }
                 """#
@@ -182,30 +111,36 @@ struct HTTPMessageComponentsFormattingTests {
         return formatter.string(from: components)
     }
 
+    private func makeStartLine(
+        method: String = "POST",
+        absolutePath: String = "/rfc/rfc9112.pdf",
+        httpVersion: String = "HTTP/1.1"
+    ) -> HTTPMessageComponents.StartLine {
+        return .requestLine(
+            method: method,
+            absolutePath: absolutePath,
+            httpVersion: httpVersion
+        )
+    }
+
+    private func makeStartLine(
+        httpVersion: String = "HTTP/1.1",
+        statusCode: Int,
+        reasonPhrase: String? = nil
+    ) -> HTTPMessageComponents.StartLine {
+        return .statusLine(
+            httpVersion: httpVersion,
+            statusCode: statusCode,
+            reason: reasonPhrase
+        )
+    }
+
     private func makeComponents(
-        method: String = "GET",
-        absolutePath: String = "",
-        httpVersion: String? = nil,
-        statusCode: Int? = nil,
-        statusReason: String? = nil,
+        startLine: HTTPMessageComponents.StartLine? = nil,
         headerFields: [String: String]? = nil,
         body: Data? = nil
     ) -> HTTPMessageComponents {
-
-        let startLine: HTTPMessageComponents.StartLine
-        if let statusCode {
-            startLine = .statusLine(
-                httpVersion: httpVersion,
-                statusCode: statusCode,
-                reason: statusReason
-            )
-        } else {
-            startLine = .requestLine(
-                method: method,
-                absolutePath: absolutePath,
-                httpVersion: httpVersion
-            )
-        }
+        let startLine = startLine ?? makeStartLine()
 
         return HTTPMessageComponents(
             startLine: startLine,

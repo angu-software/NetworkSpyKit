@@ -44,8 +44,10 @@ private struct StartLineParser {
             return nil
         }
 
-        let httpVersion =
-            Int(lineComponents.first!) == nil ? lineComponents.first! : nil
+        guard let httpVersion =
+                Int(lineComponents.first!) == nil ? lineComponents.first! : nil else {
+            return nil
+        }
 
         return .statusLine(
             httpVersion: httpVersion,
@@ -61,7 +63,10 @@ private struct StartLineParser {
 
         let method = lineComponents[0]
         let absolutePath = lineComponents[1]
-        let httpVersion = lineComponents.count == 3 ? lineComponents[2] : nil
+
+        guard let httpVersion = lineComponents.count == 3 ? lineComponents[2] : nil else {
+            return nil
+        }
 
         return .requestLine(
             method: method,

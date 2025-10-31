@@ -9,6 +9,8 @@ import Testing
 
 @testable import NetworkSpyKit
 
+// enforce positional correctness? HTTP/1.1 404 vs 404 HTTP/1.1
+
 struct HTTPMessageParserTests {
 
     @Test
@@ -37,28 +39,7 @@ struct HTTPMessageParserTests {
 
     @Test
     func
-        givenRequestMessageWithMethodAndPath_whenParsing_itBuildsRequestLine()
-        async throws
-    {
-        let message = """
-            POST /hello/world?when=fr&who=all
-            """
-
-        let parser = HTTPMessageParser()
-
-        #expect(
-            parser.components(from: message)?.startLine
-                == .requestLine(
-                    method: "POST",
-                    absolutePath: "/hello/world?when=fr&who=all",
-                    httpVersion: nil
-                )
-        )
-    }
-
-    @Test
-    func
-        givenRequestMessageWithMethodPathAndHttpVersion_whenParsing_itBuildsFullRequestLine()
+        givenRequestMessage_whenParsing_itBuildsRequestLine()
         async throws
     {
         let message = """
@@ -86,28 +67,7 @@ struct HTTPMessageParserTests {
 
     @Test
     func
-        givenStatusCode_whenParsing_itBuildsStatusLine()
-        async throws
-    {
-        let message = """
-            404
-            """
-
-        let parser = HTTPMessageParser()
-
-        #expect(
-            parser.components(from: message)?.startLine
-                == .statusLine(
-                    httpVersion: nil,
-                    statusCode: 404,
-                    reason: nil
-                )
-        )
-    }
-
-    @Test
-    func
-        givenHTTPVersionAndStatusCode_whenParsing_itBuildsStatusLineWithHTTPVersion()
+        givenStatusMessage_whenParsing_itStatusLine()
         async throws
     {
         let message = """

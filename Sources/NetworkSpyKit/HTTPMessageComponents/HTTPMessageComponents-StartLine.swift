@@ -9,9 +9,11 @@ import Foundation
 
 extension HTTPMessageComponents {
 
+    // TODO: require HTTPVersion but use default value, move closer to RFC conformance.
+    // omitting http version is convenience when matching in tests later
     enum StartLine: Equatable {
-        case requestLine(method: String, absolutePath: String, httpVersion: String?)
-        case statusLine(httpVersion: String?, statusCode: Int, reason: String?)
+        case requestLine(method: String, absolutePath: String, httpVersion: String = "HTTP/1.1")
+        case statusLine(httpVersion: String = "HTTP/1.1", statusCode: Int, reason: String?)
     }
 }
 

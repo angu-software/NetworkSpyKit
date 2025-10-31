@@ -8,8 +8,7 @@
 struct HTTPMessageParser {
 
     func components(from httpMessage: String) -> HTTPMessageComponents? {
-        var components = HTTPMessageComponents()
-        components.method = httpMessage
+        let components = HTTPMessageComponents(startLine: .requestLine(method: httpMessage, absolutePath: nil, httpVersion: nil))
 
         return components
     }

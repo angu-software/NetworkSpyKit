@@ -11,14 +11,15 @@ struct HTTPMessageFormatter {
 
     private let space = " "
     private let newLine = "\n"
-    private var startLine = HTTPMessageComponents.StartLine()
 
     func string(from components: HTTPMessageComponents) -> String {
         return makeHTTPMessageFormat(components: components)
     }
 
     // ✅ HTTP-message = start-line CRLF *( field-line CRLF ) CRLF [ message-body ]
-    private func makeHTTPMessageFormat(components: HTTPMessageComponents) -> String {
+    private func makeHTTPMessageFormat(components: HTTPMessageComponents)
+        -> String
+    {
         return [
             makeStartLine(components: components),
             makeFieldLines(components: components),
@@ -61,7 +62,12 @@ struct HTTPMessageFormatter {
     }
 
     private func isStatusLine(components: HTTPMessageComponents) -> Bool {
-        return components.startLine.statusCode != nil
+        switch components.startLine {
+        case .statusLine:
+            return true
+        case .requestLine:
+            return false
+        }
     }
 
     // ✅ start-line = request-line / status-line
@@ -80,16 +86,17 @@ struct HTTPMessageFormatter {
             makeRequestTarget(components: components),
             makeHTTPVersionToken(components: components),
         ]
-            .compactMap { $0 }
-            .joined(separator: space)
+        .compactMap { $0 }
+        .joined(separator: space)
     }
 
     // request-target = origin-form / absolute-form / authority-form / asterisk-form
     // ✅ origin-form = absolute-path [ "?" query ]
     // ✅ absolute-path = <absolute-path, see [HTTP], Section 4.1>
     // ✅ query = <query, see [URI], Section 3.4>
-    private func makeRequestTarget(components: HTTPMessageComponents) -> String? {
-        guard let absolutePath = components.absolutePath else {
+    private func makeRequestTarget(components: HTTPMessageComponents) -> String?
+    {
+        guard let absolutePath = components.startLine.absolutePath else {
             return nil
         }
 
@@ -98,12 +105,7 @@ struct HTTPMessageFormatter {
 
     // method = token
     private func makeMethodToken(components: HTTPMessageComponents) -> String? {
-
-        guard let method = components.method else {
-            return nil
-        }
-
-        return method.uppercased()
+        return components.startLine.method?.uppercased()
     }
 
     // status-line = HTTP-version SP status-code SP [ reason-phrase ]
@@ -113,13 +115,15 @@ struct HTTPMessageFormatter {
             makeStatusCodeToken(components: components),
             makeStatusReasonPhrase(components: components),
         ]
-            .compactMap { $0 }
-            .joined(separator: space)
+        .compactMap { $0 }
+        .joined(separator: space)
     }
 
     // status-code = 3DIGIT
-    private func makeStatusCodeToken(components: HTTPMessageComponents) -> String? {
-        guard let statusCode = components.statusCode else {
+    private func makeStatusCodeToken(components: HTTPMessageComponents)
+        -> String?
+    {
+        guard let statusCode = components.startLine.statusCode else {
             return nil
         }
 
@@ -127,21 +131,17 @@ struct HTTPMessageFormatter {
     }
 
     // reason-phrase = 1*( HTAB / SP / VCHAR / obs-text )
-    private func makeStatusReasonPhrase(components: HTTPMessageComponents) -> String? {
-        guard let statusReason = components.statusReason else {
-            return nil
-        }
-
-        return statusReason
+    private func makeStatusReasonPhrase(components: HTTPMessageComponents)
+        -> String?
+    {
+        return components.startLine.statusReason
     }
 
     // HTTP-version = HTTP-name "/" DIGIT "." DIGIT
     // HTTP-name = %x48.54.54.50 ; HTTP
-    private func makeHTTPVersionToken(components: HTTPMessageComponents) -> String? {
-        guard let httpVersion = components.httpVersion else {
-            return nil
-        }
-
-        return httpVersion
+    private func makeHTTPVersionToken(components: HTTPMessageComponents)
+        -> String?
+    {
+        return components.startLine.httpVersion
     }
 }

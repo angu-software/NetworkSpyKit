@@ -197,15 +197,27 @@ struct HTTPMessageComponentsFormattingTests {
         headerFields: [String: String]? = nil,
         body: Data? = nil
     ) -> HTTPMessageComponents {
-        var components = HTTPMessageComponents()
-        components.method = method
-        components.absolutePath = absolutePath
-        components.httpVersion = httpVersion
-        components.statusCode = statusCode
-        components.statusReason = statusReason
-        components.headerFields = headerFields
-        components.body = body
 
-        return components
+        let startLine: HTTPMessageComponents.StartLine
+        if let statusCode {
+            startLine = .statusLine(
+                httpVersion: httpVersion,
+                statusCode: statusCode,
+                reason: statusReason
+            )
+        } else {
+            startLine = .requestLine(
+                method: method,
+                absolutePath: absolutePath,
+                httpVersion: httpVersion
+            )
+        }
+
+        return HTTPMessageComponents(
+            startLine: startLine,
+            headerFields: headerFields,
+            body: body
+        )
+
     }
 }

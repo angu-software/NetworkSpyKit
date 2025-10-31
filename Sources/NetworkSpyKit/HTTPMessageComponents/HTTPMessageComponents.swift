@@ -67,57 +67,7 @@ import Foundation
 ///    */
 /// ```
 struct HTTPMessageComponents {
-
-    // request-line
-    var method: String? {
-        get {
-            startLine.method
-        }
-        set {
-            startLine.method = newValue
-        }
-    }
-
-    var absolutePath: String? {
-        get {
-            startLine.absolutePath
-        }
-
-        set {
-            startLine.absolutePath = newValue
-        }
-    }
-
-    // status-line
-    var statusCode: Int? {
-        get {
-            startLine.statusCode
-        }
-        set {
-            startLine.statusCode = newValue
-        }
-    }
-
-    var statusReason: String? {
-        get {
-            startLine.statusReason
-        }
-        set {
-            startLine.statusReason = newValue
-        }
-    }
-
-    var httpVersion: String? {
-        get {
-            startLine.httpVersion
-        }
-        set {
-            startLine.httpVersion = newValue
-        }
-    }
-
+    let startLine: StartLine
     var headerFields: [String: String]?
     var body: Data?
-
-    private(set) var startLine = StartLine()
 }

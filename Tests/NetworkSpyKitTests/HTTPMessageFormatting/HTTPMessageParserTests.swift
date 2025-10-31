@@ -19,7 +19,7 @@ struct HTTPMessageParserTests {
 
         let parser = HTTPMessageParser()
 
-        #expect(parser.components(from: message)?.method == "POST")
+        #expect(parser.components(from: message)?.startLine.method == "POST")
     }
 
     // given origin form - URL (unless it is possible to create URL without host)

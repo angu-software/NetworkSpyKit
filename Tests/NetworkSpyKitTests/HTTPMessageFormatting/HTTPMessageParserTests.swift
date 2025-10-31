@@ -109,7 +109,7 @@ struct HTTPMessageParserTests {
     }
 
     @Test
-    func givenBody_whenParsing_itBuildsHeaderFieldsAndBody() async throws {
+    func givenBody_whenParsing_itBuildsBody() async throws {
         let message = """
             HTTP/1.1 404 NOT FOUND
 
@@ -118,6 +118,66 @@ struct HTTPMessageParserTests {
 
         #expect(
             parse(message)?.body == "Message: Hello World".data(using: .utf8)
+        )
+    }
+
+    @Test
+    func givenStatusmessage_givenFieldsAndBody_whenParsing_itBuildsHeaderFieldsAndBody()
+        async throws
+    {
+        let message = """
+            HTTP/1.1 404 NOT FOUND
+            Accept-Language: en-US,en;q=0.9
+            Accept: application/json
+            User-Agent: NetworkSpyKit/1.0
+
+            Message: Hello World
+            """
+
+        #expect(
+            parse(message)
+                == HTTPMessageComponents(
+                    startLine: .statusLine(
+                        httpVersion: "HTTP/1.1",
+                        statusCode: 404,
+                        reason: "NOT FOUND"
+                    ),
+                    headerFields: [
+                        "Accept-Language": "en-US,en;q=0.9",
+                        "Accept": "application/json",
+                        "User-Agent": "NetworkSpyKit/1.0",
+                    ],
+                    body: "Message: Hello World".data(using: .utf8)
+                )
+        )
+    }
+
+    @Test
+    func givenRequestMessage_givenFieldsAndBody_whenParsing_itBuildsHeaderFieldsAndBody()
+        async throws
+    {
+        let message = """
+            POST / HTTP/1.1
+            Accept-Language: en-US,en;q=0.9
+            Accept: application/json
+            User-Agent: NetworkSpyKit/1.0
+
+            Message: Hello World
+            """
+
+        #expect(
+            parse(message)
+                == HTTPMessageComponents(
+                    startLine: .requestLine(method: "POST",
+                                            absolutePath: "/",
+                                            httpVersion: "HTTP/1.1"),
+                    headerFields: [
+                        "Accept-Language": "en-US,en;q=0.9",
+                        "Accept": "application/json",
+                        "User-Agent": "NetworkSpyKit/1.0",
+                    ],
+                    body: "Message: Hello World".data(using: .utf8)
+                )
         )
     }
 

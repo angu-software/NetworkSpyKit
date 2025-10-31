@@ -21,7 +21,7 @@ struct HTTPMessageParserTests {
     }
 
     @Test
-    func givenRequestMessageWithoutPath_whenParsing_itReturnsNil()
+    func givenRequestMessageWithMissingPath_whenParsing_itReturnsNil()
         async throws
     {
         let message = """
@@ -79,8 +79,4 @@ struct HTTPMessageParserTests {
     // given httpVersion and method -> nil
     // given httpVersion and path -> nil
     // --> no method & path -> nil
-
-    // given origin form - URL (unless it is possible to create URL without host)
-    // given invalid origin form -> nil
-    // given absolute form -> url
 }

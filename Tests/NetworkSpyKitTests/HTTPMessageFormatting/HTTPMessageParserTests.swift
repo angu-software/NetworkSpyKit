@@ -12,6 +12,15 @@ import Testing
 struct HTTPMessageParserTests {
 
     @Test
+    func givenEmptyString_whenParsing_itReturnsNil()
+        async throws
+    {
+        let parser = HTTPMessageParser()
+
+        #expect(parser.components(from: "") == nil)
+    }
+
+    @Test
     func givenRequestMessageWithoutPath_whenParsing_itReturnsNil()
         async throws
     {
@@ -23,9 +32,6 @@ struct HTTPMessageParserTests {
 
         #expect(parser.components(from: message) == nil)
     }
-
-    // empty string -> nil
-    // path empty -> nil
 
     // given origin form - URL (unless it is possible to create URL without host)
     // given invalid origin form -> nil

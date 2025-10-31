@@ -8,17 +8,39 @@
 import Foundation
 
 // none-strict mode
-// defaults for required fileds
+// defaults for required fields
 
 struct HTTPMessageParser {
 
     func components(from httpMessage: String) -> HTTPMessageComponents? {
-        guard let startLine = StartLineParser().startLine(from: httpMessage)
+        var messageLines = httpMessage.lines
+        let startLine = messageLines.removeFirst()
+        let fieldLines = messageLines
+
+        guard let startLine = StartLineParser().startLine(from: startLine)
         else {
             return nil
         }
 
-        return HTTPMessageComponents(startLine: startLine)
+        var messageComponents = HTTPMessageComponents(startLine: startLine)
+        messageComponents.headerFields = makeHeaderFields(fieldLines: fieldLines)
+
+        return messageComponents
+    }
+
+    private func makeHeaderFields(fieldLines: [String]) -> [String: String]? {
+        var headerFields: [String: String] = [:]
+        for line in fieldLines {
+            let fieldElements = line.split(separator: ":", maxSplits: 1).map { "\($0)" }
+            guard let key = fieldElements.element(at: 0)?.trimmingCharacters(in: .whitespacesAndNewlines),
+                  let value = fieldElements.element(at: 1)?.trimmingCharacters(in: .whitespacesAndNewlines) else {
+                continue
+            }
+
+            headerFields[key] = value
+        }
+
+        return headerFields.isEmpty ? nil : headerFields
     }
 }
 
@@ -36,9 +58,13 @@ private struct StartLineParser {
         }
     }
 
+    private func firstLine(of string: String) -> String? {
+        return string.components(separatedBy: .newlines).first
+    }
+
     // HTTPMessage start line has max three elements separated by spaces
     private func makeLineElements(string: String) -> [String]? {
-        guard let firstLine = string.components(separatedBy: .newlines).first
+        guard let firstLine = firstLine(of: string)
         else {
             return nil
         }
@@ -87,6 +113,13 @@ private struct StartLineParser {
         }
 
         return Int(string)
+    }
+}
+
+extension String {
+
+    var lines: [String] {
+        return components(separatedBy: .newlines)
     }
 }
 

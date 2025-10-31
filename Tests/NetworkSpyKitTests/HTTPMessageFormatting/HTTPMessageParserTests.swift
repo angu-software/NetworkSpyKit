@@ -15,9 +15,7 @@ struct HTTPMessageParserTests {
     func givenEmptyString_whenParsing_itReturnsNil()
         async throws
     {
-        let parser = HTTPMessageParser()
-
-        #expect(parser.components(from: "") == nil)
+        #expect(parse("") == nil)
     }
 
     // MARK: Request line
@@ -30,9 +28,7 @@ struct HTTPMessageParserTests {
             POST
             """
 
-        let parser = HTTPMessageParser()
-
-        #expect(parser.components(from: message) == nil)
+        #expect(parse(message) == nil)
     }
 
     @Test
@@ -44,10 +40,8 @@ struct HTTPMessageParserTests {
             POST /hello/world?when=fr&who=all HTTP/1.1
             """
 
-        let parser = HTTPMessageParser()
-
         #expect(
-            parser.components(from: message)?.startLine
+            parse(message)?.startLine
                 == .requestLine(
                     method: "POST",
                     absolutePath: "/hello/world?when=fr&who=all",
@@ -67,10 +61,8 @@ struct HTTPMessageParserTests {
             HTTP/1.1 404
             """
 
-        let parser = HTTPMessageParser()
-
         #expect(
-            parser.components(from: message)?.startLine
+            parse(message)?.startLine
                 == .statusLine(
                     httpVersion: "HTTP/1.1",
                     statusCode: 404,
@@ -88,15 +80,37 @@ struct HTTPMessageParserTests {
             HTTP/1.1 404 NOT FOUND
             """
 
-        let parser = HTTPMessageParser()
-
         #expect(
-            parser.components(from: message)?.startLine
+            parse(message)?.startLine
                 == .statusLine(
                     httpVersion: "HTTP/1.1",
                     statusCode: 404,
                     reason: "NOT FOUND"
                 )
         )
+    }
+
+    @Test
+    func givenFields_whenParsing_itBuildsHeaderFields() async throws {
+        let message = """
+            HTTP/1.1 404 NOT FOUND
+            Accept-Language: en-US,en;q=0.9
+            Accept: application/json
+            User-Agent: NetworkSpyKit/1.0
+            """
+
+        #expect(
+            parse(message)?.headerFields == [
+                "Accept-Language": "en-US,en;q=0.9",
+                "Accept": "application/json",
+                "User-Agent": "NetworkSpyKit/1.0",
+            ]
+        )
+    }
+
+    private func parse(_ message: String) -> HTTPMessageComponents? {
+        let parser = HTTPMessageParser()
+
+        return parser.components(from: message)
     }
 }

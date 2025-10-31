@@ -28,6 +28,12 @@ private struct StartLineParser {
             return nil
         }
 
+        if let statusCode = Int(firstLine) {
+            return .statusLine(httpVersion: nil,
+                               statusCode: statusCode,
+                               reason: nil)
+        }
+
         let components = firstLine.components(separatedBy: space)
         guard components.count >= 2 else {
             return nil

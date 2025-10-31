@@ -20,6 +20,8 @@ struct HTTPMessageParserTests {
         #expect(parser.components(from: "") == nil)
     }
 
+    // MARK: Request line
+
     @Test
     func givenRequestMessageWithMissingPath_whenParsing_itReturnsNil()
         async throws
@@ -35,7 +37,7 @@ struct HTTPMessageParserTests {
 
     @Test
     func
-        givenRequestMessageWithMethodAndPath_whenParsing_itReturnsRequestMessage()
+        givenRequestMessageWithMethodAndPath_whenParsing_itBuildsRequestLine()
         async throws
     {
         let message = """
@@ -56,7 +58,7 @@ struct HTTPMessageParserTests {
 
     @Test
     func
-        givenRequestMessageWithMethodPathAndHttpVersion_whenParsing_itRetunsFullRequestLine()
+        givenRequestMessageWithMethodPathAndHttpVersion_whenParsing_itBuildsFullRequestLine()
         async throws
     {
         let message = """
@@ -79,4 +81,27 @@ struct HTTPMessageParserTests {
     // given httpVersion and method -> nil
     // given httpVersion and path -> nil
     // --> no method & path -> nil
+
+    // MARK: Status line
+
+    @Test
+    func
+        givenStatusCode_whenParsing_itBuildsStatusLine()
+        async throws
+    {
+        let message = """
+            404
+            """
+
+        let parser = HTTPMessageParser()
+
+        #expect(
+            parser.components(from: message)?.startLine
+                == .statusLine(
+                    httpVersion: nil,
+                    statusCode: 404,
+                    reason: nil
+                )
+        )
+    }
 }

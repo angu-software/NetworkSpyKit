@@ -12,15 +12,27 @@ import Testing
 struct HTTPMessageParserTests {
 
     @Test
-    func givenRequestMessage_givenMethod_itParsesComponentsWithMethod() async throws {
+    func givenRequestMessage_itParsesRequestStartLine()
+        async throws
+    {
         let message = """
             POST
             """
 
         let parser = HTTPMessageParser()
 
-        #expect(parser.components(from: message)?.startLine.method == "POST")
+        #expect(
+            parser.components(from: message)?.startLine
+                == .requestLine(
+                    method: "POST",
+                    absolutePath: "",
+                    httpVersion: nil
+                )
+        )
     }
+
+    // empty string -> nil
+    // path empty -> nil
 
     // given origin form - URL (unless it is possible to create URL without host)
     // given invalid origin form -> nil

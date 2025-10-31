@@ -29,26 +29,20 @@ struct HTTPMessageComponentsFormattingTests {
     ]
     private let body: Data? = #"{ "Hello World" }"#.data(using: .utf8)
 
-    @Test
-    func givenNothing_itReturnsEmptyString() {
-        let components = makeComponents()
-
-        #expect(format(components).isEmpty)
-    }
-
     // MARK: - Request Message
 
     // MARK: request-target: origin-form
 
     @Test
-    func requestMessage_givenEmptyAbsolutePath_itIncludesRootPath() {
+    func requestMessage_itFormatsMethodAndAbsolutePath() {
         let components = makeComponents(
+            method: "GET",
             absolutePath: ""
         )
 
         #expect(
             format(components) == """
-                /
+                GET /
                 """
         )
     }
@@ -61,7 +55,7 @@ struct HTTPMessageComponentsFormattingTests {
 
         #expect(
             format(components) == """
-                /rfc/rfc9112.pdf
+                GET /rfc/rfc9112.pdf
                 """
         )
     }
@@ -189,8 +183,8 @@ struct HTTPMessageComponentsFormattingTests {
     }
 
     private func makeComponents(
-        method: String? = nil,
-        absolutePath: String? = nil,
+        method: String = "GET",
+        absolutePath: String = "",
         httpVersion: String? = nil,
         statusCode: Int? = nil,
         statusReason: String? = nil,

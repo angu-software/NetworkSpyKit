@@ -9,9 +9,9 @@ import Foundation
 
 extension HTTPMessageComponents {
 
-    enum StartLine {
-        case requestLine(method: String?, absolutePath: String?, httpVersion: String?)
-        case statusLine(httpVersion: String?, statusCode: Int?, reason: String?)
+    enum StartLine: Equatable {
+        case requestLine(method: String, absolutePath: String, httpVersion: String?)
+        case statusLine(httpVersion: String?, statusCode: Int, reason: String?)
     }
 }
 

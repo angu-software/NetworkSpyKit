@@ -12,7 +12,7 @@ import Testing
 struct HTTPMessageParserTests {
 
     @Test
-    func givenRequestMessage_itParsesRequestStartLine()
+    func givenRequestMessageWithoutPath_whenParsing_itReturnsNil()
         async throws
     {
         let message = """
@@ -21,14 +21,7 @@ struct HTTPMessageParserTests {
 
         let parser = HTTPMessageParser()
 
-        #expect(
-            parser.components(from: message)?.startLine
-                == .requestLine(
-                    method: "POST",
-                    absolutePath: "",
-                    httpVersion: nil
-                )
-        )
+        #expect(parser.components(from: message) == nil)
     }
 
     // empty string -> nil

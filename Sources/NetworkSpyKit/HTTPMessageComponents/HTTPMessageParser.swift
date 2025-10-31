@@ -7,9 +7,14 @@
 
 struct HTTPMessageParser {
 
-    func components(from httpMessage: String) -> HTTPMessageComponents? {
-        let components = HTTPMessageComponents(startLine: .requestLine(method: httpMessage, absolutePath: "", httpVersion: nil))
+    private let space = " "
 
-        return components
+    func components(from httpMessage: String) -> HTTPMessageComponents? {
+        let components = httpMessage.components(separatedBy: space)
+        guard components.count == 2 else {
+            return nil
+        }
+
+        return HTTPMessageComponents(startLine: .requestLine(method: httpMessage, absolutePath: "", httpVersion: nil))
     }
 }

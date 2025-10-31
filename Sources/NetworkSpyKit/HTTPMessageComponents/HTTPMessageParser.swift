@@ -24,24 +24,44 @@ private struct StartLineParser {
     private let space = " "
 
     func startLine(from string: String) -> HTTPMessageComponents.StartLine? {
-        guard let firstLine = string.components(separatedBy: .newlines).first else {
+        guard let firstLine = string.components(separatedBy: .newlines).first
+        else {
             return nil
         }
 
-        if let statusCode = Int(firstLine) {
-            return .statusLine(httpVersion: nil,
-                               statusCode: statusCode,
-                               reason: nil)
-        }
+        let lineComponents = firstLine.components(separatedBy: space)
 
-        let components = firstLine.components(separatedBy: space)
-        guard components.count >= 2 else {
+        if let statusLine = makeStatusLine(lineComponents: lineComponents) {
+            return statusLine
+        } else {
+            return makeRequestLine(lineComponents: lineComponents)
+        }
+    }
+
+    private func makeStatusLine(lineComponents: [String]) -> HTTPMessageComponents.StartLine? {
+        guard let statusCode = lineComponents.compactMap({ Int($0) }).first
+        else {
             return nil
         }
 
-        let method = components[0]
-        let absolutePath = components[1]
-        let httpVersion = components.count == 3 ? components[2] : nil
+        let httpVersion =
+            Int(lineComponents.first!) == nil ? lineComponents.first! : nil
+
+        return .statusLine(
+            httpVersion: httpVersion,
+            statusCode: statusCode,
+            reason: nil
+        )
+    }
+
+    private func makeRequestLine(lineComponents: [String]) -> HTTPMessageComponents.StartLine? {
+        guard lineComponents.count >= 2 else {
+            return nil
+        }
+
+        let method = lineComponents[0]
+        let absolutePath = lineComponents[1]
+        let httpVersion = lineComponents.count == 3 ? lineComponents[2] : nil
 
         return .requestLine(
             method: method,

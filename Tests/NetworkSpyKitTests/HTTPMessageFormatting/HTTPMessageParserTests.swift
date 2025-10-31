@@ -104,4 +104,25 @@ struct HTTPMessageParserTests {
                 )
         )
     }
+
+    @Test
+    func
+        givenHTTPVersionAndStatusCode_whenParsing_itBuildsStatusLineWithHTTPVersion()
+        async throws
+    {
+        let message = """
+            HTTP/1.1 404
+            """
+
+        let parser = HTTPMessageParser()
+
+        #expect(
+            parser.components(from: message)?.startLine
+                == .statusLine(
+                    httpVersion: "HTTP/1.1",
+                    statusCode: 404,
+                    reason: nil
+                )
+        )
+    }
 }

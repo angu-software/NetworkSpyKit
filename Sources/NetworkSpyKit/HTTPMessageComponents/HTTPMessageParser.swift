@@ -7,6 +7,9 @@
 
 import Foundation
 
+// none-strict mode
+// defaults for required fileds
+
 struct HTTPMessageParser {
 
     func components(from httpMessage: String) -> HTTPMessageComponents? {
@@ -21,50 +24,35 @@ struct HTTPMessageParser {
 
 private struct StartLineParser {
 
-    private let space = " "
-
     func startLine(from string: String) -> HTTPMessageComponents.StartLine? {
+        guard let startLineElements = makeLineElements(string: string) else {
+            return nil
+        }
+
+        if let statusLine = makeStatusLine(lineElements: startLineElements) {
+            return statusLine
+        } else {
+            return makeRequestLine(lineElements: startLineElements)
+        }
+    }
+
+    // HTTPMessage start line has max three elements separated by spaces
+    private func makeLineElements(string: String) -> [String]? {
         guard let firstLine = string.components(separatedBy: .newlines).first
         else {
             return nil
         }
 
-        let lineComponents = firstLine.components(separatedBy: space)
-
-        if let statusLine = makeStatusLine(lineComponents: lineComponents) {
-            return statusLine
-        } else {
-            return makeRequestLine(lineComponents: lineComponents)
-        }
+        return firstLine.split(separator: " ", maxSplits: 2).map { "\($0)"}
     }
 
-    private func makeStatusLine(lineComponents: [String]) -> HTTPMessageComponents.StartLine? {
-        guard let statusCode = lineComponents.compactMap({ Int($0) }).first
+    private func makeRequestLine(lineElements: [String])
+        -> HTTPMessageComponents.StartLine?
+    {
+        guard let method = lineElements.element(at: 0),
+            let absolutePath = lineElements.element(at: 1),
+            let httpVersion = lineElements.element(at: 2)
         else {
-            return nil
-        }
-
-        guard let httpVersion =
-                Int(lineComponents.first!) == nil ? lineComponents.first! : nil else {
-            return nil
-        }
-
-        return .statusLine(
-            httpVersion: httpVersion,
-            statusCode: statusCode,
-            reason: nil
-        )
-    }
-
-    private func makeRequestLine(lineComponents: [String]) -> HTTPMessageComponents.StartLine? {
-        guard lineComponents.count >= 2 else {
-            return nil
-        }
-
-        let method = lineComponents[0]
-        let absolutePath = lineComponents[1]
-
-        guard let httpVersion = lineComponents.count == 3 ? lineComponents[2] : nil else {
             return nil
         }
 
@@ -73,5 +61,42 @@ private struct StartLineParser {
             absolutePath: absolutePath,
             httpVersion: httpVersion
         )
+    }
+
+    private func makeStatusLine(lineElements: [String])
+        -> HTTPMessageComponents.StartLine?
+    {
+        guard let httpVersion = lineElements.element(at: 0),
+            let statusCode = makeStatusCode(string: lineElements.element(at: 1))
+        else {
+            return nil
+        }
+
+        let reasonPhrase = lineElements.element(at: 2) ?? ""
+
+        return .statusLine(
+            httpVersion: httpVersion,
+            statusCode: statusCode,
+            reason: reasonPhrase.isEmpty ? nil : reasonPhrase
+        )
+    }
+
+    private func makeStatusCode(string: String?) -> Int? {
+        guard let string else {
+            return nil
+        }
+
+        return Int(string)
+    }
+}
+
+extension Array {
+
+    func element(at index: Int) -> Element? {
+        guard indices.contains(index) else {
+            return nil
+        }
+
+        return self[index]
     }
 }

@@ -9,8 +9,6 @@ import Testing
 
 @testable import NetworkSpyKit
 
-// enforce positional correctness? HTTP/1.1 404 vs 404 HTTP/1.1
-
 struct HTTPMessageParserTests {
 
     @Test
@@ -58,16 +56,11 @@ struct HTTPMessageParserTests {
         )
     }
 
-    // given httpVersion only -> nil
-    // given httpVersion and method -> nil
-    // given httpVersion and path -> nil
-    // --> no method & path -> nil
-
     // MARK: Status line
 
     @Test
     func
-        givenStatusMessage_whenParsing_itStatusLine()
+        givenStatusMessage_whenParsing_itBuildsStatusLine()
         async throws
     {
         let message = """
@@ -82,6 +75,27 @@ struct HTTPMessageParserTests {
                     httpVersion: "HTTP/1.1",
                     statusCode: 404,
                     reason: nil
+                )
+        )
+    }
+
+    @Test
+    func
+        givenStatusMessageWithReason_whenParsing_itBuildsStatusLineWithReasonPhrase()
+        async throws
+    {
+        let message = """
+            HTTP/1.1 404 NOT FOUND
+            """
+
+        let parser = HTTPMessageParser()
+
+        #expect(
+            parser.components(from: message)?.startLine
+                == .statusLine(
+                    httpVersion: "HTTP/1.1",
+                    statusCode: 404,
+                    reason: "NOT FOUND"
                 )
         )
     }

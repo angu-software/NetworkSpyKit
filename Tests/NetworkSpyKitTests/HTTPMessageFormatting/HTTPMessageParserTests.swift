@@ -54,6 +54,27 @@ struct HTTPMessageParserTests {
         )
     }
 
+    @Test
+    func
+        givenRequestMessageWithMethodPathAndHttpVersion_whenParsing_itRetunsFullRequestLine()
+        async throws
+    {
+        let message = """
+            POST /hello/world?when=fr&who=all HTTP/1.1
+            """
+
+        let parser = HTTPMessageParser()
+
+        #expect(
+            parser.components(from: message)?.startLine
+                == .requestLine(
+                    method: "POST",
+                    absolutePath: "/hello/world?when=fr&who=all",
+                    httpVersion: "HTTP/1.1"
+                )
+        )
+    }
+
     // given httpVersion only -> nil
     // given httpVersion and method -> nil
     // given httpVersion and path -> nil

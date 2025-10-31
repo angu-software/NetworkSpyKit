@@ -11,10 +11,17 @@ struct HTTPMessageParser {
 
     func components(from httpMessage: String) -> HTTPMessageComponents? {
         let components = httpMessage.components(separatedBy: space)
-        guard components.count == 2 else {
+        guard components.count >= 2 else {
             return nil
         }
 
-        return HTTPMessageComponents(startLine: .requestLine(method: components[0], absolutePath: components[1], httpVersion: nil))
+        var httpVersion: String?
+        if components.count == 3 {
+            httpVersion = components[2]
+        }
+
+        return HTTPMessageComponents(startLine: .requestLine(method: components[0],
+                                                             absolutePath: components[1],
+                                                             httpVersion: httpVersion))
     }
 }

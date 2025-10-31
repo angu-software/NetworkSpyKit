@@ -66,7 +66,7 @@ import Foundation
 ///    * { "ok": true }
 ///    */
 /// ```
-struct HTTPMessageComponents {
+struct HTTPMessageComponents: Equatable {
     let startLine: StartLine
     var headerFields: [String: String]?
     var body: Data?

@@ -15,6 +15,6 @@ struct HTTPMessageParser {
             return nil
         }
 
-        return HTTPMessageComponents(startLine: .requestLine(method: httpMessage, absolutePath: "", httpVersion: nil))
+        return HTTPMessageComponents(startLine: .requestLine(method: components[0], absolutePath: components[1], httpVersion: nil))
     }
 }

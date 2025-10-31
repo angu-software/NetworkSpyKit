@@ -33,6 +33,32 @@ struct HTTPMessageParserTests {
         #expect(parser.components(from: message) == nil)
     }
 
+    @Test
+    func
+        givenRequestMessageWithMethodAndPath_whenParsing_itReturnsRequestMessage()
+        async throws
+    {
+        let message = """
+            POST /hello/world?when=fr&who=all
+            """
+
+        let parser = HTTPMessageParser()
+
+        #expect(
+            parser.components(from: message)?.startLine
+                == .requestLine(
+                    method: "POST",
+                    absolutePath: "/hello/world?when=fr&who=all",
+                    httpVersion: nil
+                )
+        )
+    }
+
+    // given httpVersion only -> nil
+    // given httpVersion and method -> nil
+    // given httpVersion and path -> nil
+    // --> no method & path -> nil
+
     // given origin form - URL (unless it is possible to create URL without host)
     // given invalid origin form -> nil
     // given absolute form -> url

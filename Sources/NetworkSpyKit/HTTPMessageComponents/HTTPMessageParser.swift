@@ -12,20 +12,23 @@ import Foundation
 
 struct HTTPMessageParser {
 
-    func components(from httpMessage: String) -> HTTPMessageComponents? {
-        var messageLines = httpMessage.lines
-        let startLine = messageLines.removeFirst()
-        let fieldLines = messageLines
+    private let emptyLine = "\n\n"
 
-        guard let startLine = StartLineParser().startLine(from: startLine)
-        else {
+    func components(from httpMessage: String) -> HTTPMessageComponents? {
+        guard let messageParts = MessageParts(string: httpMessage),
+              let startLine = makeStartLine(string: messageParts.startLine) else {
             return nil
         }
 
         var messageComponents = HTTPMessageComponents(startLine: startLine)
-        messageComponents.headerFields = makeHeaderFields(fieldLines: fieldLines)
+        messageComponents.headerFields = makeHeaderFields(fieldLines: messageParts.fieldLines)
+        messageComponents.body = messageParts.body?.data(using: .utf8)
 
         return messageComponents
+    }
+
+    private func makeStartLine(string: String) -> HTTPMessageComponents.StartLine? {
+        return StartLineParser().startLine(from: string)
     }
 
     private func makeHeaderFields(fieldLines: [String]) -> [String: String]? {
@@ -41,6 +44,49 @@ struct HTTPMessageParser {
         }
 
         return headerFields.isEmpty ? nil : headerFields
+    }
+}
+
+struct MessageParts {
+
+    let message: String
+    let body: String?
+
+    var startLine: String {
+        var messageLines = messageLines
+        return messageLines.removeFirst()
+    }
+
+    var fieldLines: [String] {
+        var messageLines = messageLines
+        _ = messageLines.removeFirst()
+        return messageLines
+    }
+
+    private static let emptyLine = "\n\n"
+
+    private var messageLines: [String] {
+        return message.lines
+    }
+
+    init?(string: String) {
+        let scanner = Scanner(string: string)
+        scanner.charactersToBeSkipped = nil
+        guard let messagePart = scanner.scanUpToString(Self.emptyLine) else {
+            return nil
+        }
+
+        _ = scanner.scanString(Self.emptyLine)
+        let bodyPart = scanner.string[scanner.currentIndex...]
+
+        self.init(message: messagePart,
+                  body: bodyPart.isEmpty ? nil : String(bodyPart))
+    }
+
+    private init(message: String,
+                 body: String?) {
+        self.message = message
+        self.body = body
     }
 }
 

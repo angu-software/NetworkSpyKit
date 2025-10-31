@@ -108,6 +108,21 @@ struct HTTPMessageParserTests {
         )
     }
 
+    @Test
+    func givenBody_whenParsing_itBuildsHeaderFieldsAndBody() async throws {
+        let message = """
+            HTTP/1.1 404 NOT FOUND
+
+            Message: Hello World
+            """
+
+        #expect(
+            parse(message)?.body == "Message: Hello World".data(using: .utf8)
+        )
+    }
+
+    // MARK: Test Support
+
     private func parse(_ message: String) -> HTTPMessageComponents? {
         let parser = HTTPMessageParser()
 

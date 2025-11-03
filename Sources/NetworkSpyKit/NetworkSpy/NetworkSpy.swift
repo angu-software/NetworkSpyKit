@@ -46,6 +46,11 @@ public final class NetworkSpy: Sendable {
         }
     }
 
+    /// An array of all `Request` instances that have been intercepted by this spy.
+    ///
+    /// - Important: The array reflects the requests recorded during the lifetime of this `NetworkSpy`
+    ///   instance. Requests are appended in the order they are intercepted.
+    /// - Returns: A snapshot of the recorded requests at the time of access.
     public var recordedRequests: [Request] {
         return requestRecorder.recordedRequests
     }

@@ -10,11 +10,11 @@ import Foundation
 extension SpyRegistry {
 
     func spy(for request: URLRequest) -> NetworkSpy? {
-        guard let sypId = spyId(for: request) else {
+        guard let spyId = spyId(for: request) else {
             return nil
         }
 
-        return spy(byId: sypId)
+        return spy(byId: spyId)
     }
 
     private func spyId(for request: URLRequest) -> String? {

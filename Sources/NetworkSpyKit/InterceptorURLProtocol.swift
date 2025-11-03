@@ -19,10 +19,10 @@ final class InterceptorURLProtocol: URLProtocol {
     private func response(for request: URLRequest) throws -> (response: HTTPURLResponse, data: Data?) {
         let spy = try spy(for: request)
 
-        let normlizedRequest = request.removedSpyIDHeader()
-        spy.record(normlizedRequest)
+        let normalizedRequest = request.removedSpyIDHeader()
+        spy.record(normalizedRequest)
 
-        return try spy.response(for: normlizedRequest)
+        return try spy.response(for: normalizedRequest)
     }
 
     private func spy(for request: URLRequest) throws -> NetworkSpy {

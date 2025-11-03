@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'NetworkSpyKit'
-  s.version          = '0.1.0'
+  s.version          = '1.1.0'
   s.summary          = 'A lightweight, thread-safe HTTP spy and stub tool for testing code that performs network requests in Swift.'
 
   s.description      = <<-DESC

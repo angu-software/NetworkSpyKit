@@ -12,6 +12,7 @@ struct HTTPMessageFormatter {
     private let space = " "
     private let newLine = "\n"
 
+    /// - Note: Header fields are sorted in the formatted message
     func string(from components: HTTPMessageComponents) -> String {
         return makeHTTPMessageFormat(components: components)
     }

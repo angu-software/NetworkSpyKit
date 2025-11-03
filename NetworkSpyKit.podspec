@@ -19,8 +19,8 @@ DESC
   s.source           = { :git => 'https://github.com/angu-software/NetworkSpyKit.git', :tag => s.version.to_s }
 
   s.swift_version    = '6.1'
-  s.platform     = :ios, '13.0'
-  s.platform     = :osx, '10.15'
+  s.platform         = :ios, '13.0'
+  s.platform         = :osx, '10.15'
 
   s.source_files = 'Sources/NetworkSpyKit/**/*.swift'
 end

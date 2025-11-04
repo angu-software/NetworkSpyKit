@@ -49,7 +49,7 @@ struct NetworkSpyKitTests {
     }
 
     @Test
-    func should_allow_changing_response_provider_after_initalization() async throws {
+    func should_allow_changing_response_provider_after_initialization() async throws {
         let spy = NetworkSpy(sessionConfiguration: .default) { _ in
             throw TestingError.somethingWentWrong
         }
@@ -62,7 +62,7 @@ struct NetworkSpyKitTests {
     }
 
     @Test
-    func should_provide_default_response_provider_at_initalization() async throws {
+    func should_provide_default_response_provider_at_initialization() async throws {
         let spy = NetworkSpy(sessionConfiguration: .default)
         let networkClient = NetworkClientFake(sessionConfiguration: spy.sessionConfiguration)
 
